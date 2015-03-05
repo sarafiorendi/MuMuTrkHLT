@@ -272,26 +272,26 @@ class JpsiTrkTreeMaker : public edm::EDAnalyzer {
   
   int overlap(const reco::Candidate &a, const reco::Track b) 
   {
-	double eps(1.e-3);
-	double dphi = deltaPhi(a.phi(), b.phi());
-	dphi *= dphi;
-	double deta = a.eta() - b.eta();
-	deta *= deta;
-	if ((dphi + deta) < eps) {
-	  return 1;
-	}
-	return 0;
+    double eps(1.e-3);
+    double dphi = deltaPhi(a.phi(), b.phi());
+    dphi *= dphi;
+    double deta = a.eta() - b.eta();
+    deta *= deta;
+    if ((dphi + deta) < eps) {
+      return 1;
+    }
+    return 0;
   }
 
   FreeTrajectoryState initialFreeState( const reco::Track& tk, const MagneticField* field)
   {
-	Basic3DVector<float> pos( tk.vertex());
-	GlobalPoint gpos( pos);
-	Basic3DVector<float> mom( tk.momentum());
-	GlobalVector gmom( mom);
-	GlobalTrajectoryParameters par( gpos, gmom, tk.charge(), field);
-	CurvilinearTrajectoryError err( tk.covariance());
-	return FreeTrajectoryState( par, err);
+    Basic3DVector<float> pos( tk.vertex());
+    GlobalPoint gpos( pos);
+    Basic3DVector<float> mom( tk.momentum());
+    GlobalVector gmom( mom);
+    GlobalTrajectoryParameters par( gpos, gmom, tk.charge(), field);
+    CurvilinearTrajectoryError err( tk.covariance());
+    return FreeTrajectoryState( par, err);
   }
 
 

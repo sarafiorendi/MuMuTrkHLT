@@ -342,14 +342,14 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
           if (T_JpsiCosBS         < minJpsiCos_   ) continue;
           if (T_MuMuCL            < minJpsiCL_    ) continue;
 
-		  if ( mu1->charge() > 0 ){
-			T_MatchMu1 = deltaR(mu1->eta(),mu1->phi(),p_muP.Eta(),p_muP.Phi());
-			T_MatchMu2 = deltaR(mu2->eta(),mu2->phi(),p_muM.Eta(),p_muM.Phi());
-		  }
-		  else {
-			T_MatchMu1 = deltaR(mu2->eta(),mu2->phi(),p_muP.Eta(),p_muP.Phi());
-			T_MatchMu2 = deltaR(mu1->eta(),mu1->phi(),p_muM.Eta(),p_muM.Phi());
-		  }
+          if ( mu1->charge() > 0 ){
+            T_MatchMu1 = deltaR(mu1->eta(),mu1->phi(),p_muP.Eta(),p_muP.Phi());
+            T_MatchMu2 = deltaR(mu2->eta(),mu2->phi(),p_muM.Eta(),p_muM.Phi());
+          }
+          else {
+            T_MatchMu1 = deltaR(mu2->eta(),mu2->phi(),p_muP.Eta(),p_muP.Phi());
+            T_MatchMu2 = deltaR(mu1->eta(),mu1->phi(),p_muM.Eta(),p_muM.Phi());
+          }
 
           // Loop on track collection - trk 1
           for (unsigned tracksIt =0 ;  tracksIt < tracks->size(); tracksIt++)
@@ -361,9 +361,9 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
             if (overlap(*mu1,itrk1))    continue;
             if (overlap(*mu2,itrk1))    continue;
             
-			if      (itrk1.charge() == T_PiCharge)   T_MatchTrkP = deltaR(itrk1.eta(), itrk1.phi(), p_pi.Eta(), p_pi.Phi()); 
-			else if (itrk1.charge() == T_KCharge)    T_MatchTrkP = deltaR(itrk1.eta(), itrk1.phi(), p_k.Eta(),  p_k.Phi() ); 
-			if (T_MatchTrkP > 0.2 ) continue;
+            if      (itrk1.charge() == T_PiCharge)   T_MatchTrkP = deltaR(itrk1.eta(), itrk1.phi(), p_pi.Eta(), p_pi.Phi()); 
+            else if (itrk1.charge() == T_KCharge)    T_MatchTrkP = deltaR(itrk1.eta(), itrk1.phi(), p_k.Eta(),  p_k.Phi() ); 
+            if (T_MatchTrkP > 0.2 ) continue;
 
             T_TrkPPt  = itrk1.pt( ) ;
             T_TrkPEta = itrk1.eta() ;
@@ -397,13 +397,13 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
               else if (itrk2.charge() == T_KCharge)    T_MatchTrkM = deltaR(itrk2.eta(), itrk2.phi(), p_k.Eta(),  p_k.Phi() ); 
               if (T_MatchTrkM > 0.2 ) continue;
 
-        	  T_TrkMPt  = itrk2.pt( ) ;
-			  T_TrkMEta = itrk2.eta() ;
-			  T_TrkMPhi = itrk2.phi() ;
-			  T_TrkMHQ  = 0;
-			  if (itrk2.quality(reco::TrackBase::highPurity)) T_TrkMHQ = 1;
+              T_TrkMPt  = itrk2.pt( ) ;
+              T_TrkMEta = itrk2.eta() ;
+              T_TrkMPhi = itrk2.phi() ;
+              T_TrkMHQ  = 0;
+              if (itrk2.quality(reco::TrackBase::highPurity)) T_TrkMHQ = 1;
 
-			  if ( (*d0Trk1Coll).size() != (*LSigmaColl).size())  std::cout << "different sizes" << std::endl;
+              if ( (*d0Trk1Coll).size() != (*LSigmaColl).size())  std::cout << "different sizes" << std::endl;
 
               FreeTrajectoryState InitialFTS2 = initialFreeState(itrk2, magField);
               TrajectoryStateClosestToBeamLine tscb2( blsBuilder(InitialFTS2, *recoBeamSpotHandle) );
@@ -472,25 +472,25 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
 
               if ((vertex.chi2()>=0.0) && (vertex.ndof()>0) )   T_JpsiTkTkCL = TMath::Prob(vertex.chi2(), vertex.ndof() );
 
-			  T_JpsiTkTkVtx_hltReco_dx = 10;
-			  T_JpsiTkTkVtx_hltReco_dy = 10;
-			  T_JpsiTkTkVtx_hltReco_dz = 10;
-			  GlobalPoint hlt_secondaryVertex;
-			  GlobalError hlt_secondaryVertexErr;
+              T_JpsiTkTkVtx_hltReco_dx = 10;
+              T_JpsiTkTkVtx_hltReco_dy = 10;
+              T_JpsiTkTkVtx_hltReco_dz = 10;
+              GlobalPoint hlt_secondaryVertex;
+              GlobalError hlt_secondaryVertexErr;
               for (unsigned vtxIt = 0 ;  vtxIt < hltVertices.size(); vtxIt++){
                 float idx = hltVertices.at(vtxIt).position().x() - tv.position().x();
                 float idy = hltVertices.at(vtxIt).position().y() - tv.position().y();
                 float idz = hltVertices.at(vtxIt).position().z() - tv.position().z();
                 if (fabs(idx) < fabs(T_JpsiTkTkVtx_hltReco_dx)  &&  fabs(idy) < fabs(T_JpsiTkTkVtx_hltReco_dy)){
-				  T_JpsiTkTkVtx_hltReco_dx      = idx;
-				  T_JpsiTkTkVtx_hltReco_dy      = idy;
-				  T_JpsiTkTkVtx_hltReco_dz      = idz;
-				  T_hlt_JpsiTkPosition_x      = hltVertices.at(vtxIt).position().x();
-				  T_hlt_JpsiTkPosition_y      = hltVertices.at(vtxIt).position().y();
-				  T_hlt_JpsiTkPosition_z      = hltVertices.at(vtxIt).position().z();
-				  T_hlt_JpsiTkPositionError_x = hltVertices.at(vtxIt).xError();
-				  T_hlt_JpsiTkPositionError_y = hltVertices.at(vtxIt).yError();
-				  T_hlt_JpsiTkPositionError_z = hltVertices.at(vtxIt).zError();
+                  T_JpsiTkTkVtx_hltReco_dx      = idx;
+                  T_JpsiTkTkVtx_hltReco_dy      = idy;
+                  T_JpsiTkTkVtx_hltReco_dz      = idz;
+                  T_hlt_JpsiTkPosition_x      = hltVertices.at(vtxIt).position().x();
+                  T_hlt_JpsiTkPosition_y      = hltVertices.at(vtxIt).position().y();
+                  T_hlt_JpsiTkPosition_z      = hltVertices.at(vtxIt).position().z();
+                  T_hlt_JpsiTkPositionError_x = hltVertices.at(vtxIt).xError();
+                  T_hlt_JpsiTkPositionError_y = hltVertices.at(vtxIt).yError();
+                  T_hlt_JpsiTkPositionError_z = hltVertices.at(vtxIt).zError();
                   T_hlt_JpsiTkCL = TMath::Prob(hltVertices.at(vtxIt).chi2(), hltVertices.at(vtxIt).ndof() );
 //                   hlt_secondaryVertex    = hltVertices.at(vtxIt).position();
 //                   hlt_secondaryVertexErr = hltVertices.at(vtxIt).positionError();
@@ -514,12 +514,12 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
                                                     -1*((vertexBeamSpot.y0() - secondaryVertex.y()) + (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dydz()), 0);
               reco::Vertex::Point vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
               
-			  T_JpsiTkTkL          = displacementFromBeamspot.perp();
-			  T_JpsiTkTkSigma      = sqrt(err.rerr(displacementFromBeamspot));
+              T_JpsiTkTkL          = displacementFromBeamspot.perp();
+              T_JpsiTkTkSigma      = sqrt(err.rerr(displacementFromBeamspot));
               T_JpsiTkTkCosBS      = vperp.Dot(pperp)/(vperp.R()*pperp.R());
-			  T_JpsiTkTkPosition_x = secondaryVertex.x();
-			  T_JpsiTkTkPosition_y = secondaryVertex.y();
-			  T_JpsiTkTkPosition_z = secondaryVertex.z();
+              T_JpsiTkTkPosition_x = secondaryVertex.x();
+              T_JpsiTkTkPosition_y = secondaryVertex.y();
+              T_JpsiTkTkPosition_z = secondaryVertex.z();
 
               hists_["MatchTrkP" ] -> Fill(T_MatchTrkP           );            
               hists_["MatchTrkM" ] -> Fill(T_MatchTrkM           );            
@@ -538,24 +538,24 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
                   T_hlt_TrkPPhi    = probeTo.phi(  );
                 }
               }
-   			  if (T_hlt_TrkPPt!=0){
-   			    for(unsigned int il3=0; il3< (*d0Trk1Coll).size(); ++il3) {
-   			      if ((*d0Trk1Coll).at(il3).first->pt() != T_hlt_TrkPPt) continue;
-   			      T_hlt_TrkPd0Sign = d0Trk1Coll->at(il3).second;
-   			    }
-   			    for(unsigned int il3=0; il3< (*LSigmaColl).size(); ++il3) {
-   			      if ((*LSigmaColl).at(il3).first->pt() != T_hlt_TrkPPt) continue;
-   			      T_hlt_JpsiTkPLSigma = LSigmaColl->at(il3).second;
-   			    }
-   			    for(unsigned int il3=0; il3< (*CosineColl).size(); ++il3) {
-   			      if ((*CosineColl).at(il3).first->pt() != T_hlt_TrkPPt) continue;
-   			      T_hlt_JpsiTkPCosBS = CosineColl->at(il3).second;
-   			    }
-   			    for(unsigned int il3=0; il3< (*VertexColl).size(); ++il3) {
-   			      if ((*VertexColl).at(il3).first->pt() != T_hlt_TrkPPt) continue;
-   			      T_hlt_JpsiTkPCLTest = VertexColl->at(il3).second;
-   			    }
-   			  }  
+              if (T_hlt_TrkPPt!=0){
+                for(unsigned int il3=0; il3< (*d0Trk1Coll).size(); ++il3) {
+                  if ((*d0Trk1Coll).at(il3).first->pt() != T_hlt_TrkPPt) continue;
+                  T_hlt_TrkPd0Sign = d0Trk1Coll->at(il3).second;
+                }
+                for(unsigned int il3=0; il3< (*LSigmaColl).size(); ++il3) {
+                  if ((*LSigmaColl).at(il3).first->pt() != T_hlt_TrkPPt) continue;
+                  T_hlt_JpsiTkPLSigma = LSigmaColl->at(il3).second;
+                }
+                for(unsigned int il3=0; il3< (*CosineColl).size(); ++il3) {
+                  if ((*CosineColl).at(il3).first->pt() != T_hlt_TrkPPt) continue;
+                  T_hlt_JpsiTkPCosBS = CosineColl->at(il3).second;
+                }
+                for(unsigned int il3=0; il3< (*VertexColl).size(); ++il3) {
+                  if ((*VertexColl).at(il3).first->pt() != T_hlt_TrkPPt) continue;
+                  T_hlt_JpsiTkPCLTest = VertexColl->at(il3).second;
+                }
+                 }  
 
               double finProbe2DeltaR = 1.0; 
               for(unsigned int i=0; i!=nProbeTrig; ++i) 
@@ -571,24 +571,24 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
                   T_hlt_TrkMPhi    = probeTo.phi(  );
                 }
               }
-   			  if (T_hlt_TrkMPt!=0){
-   			    for(unsigned int il3=0; il3< (*d0Trk1Coll).size(); ++il3) {
-   			      if ((*d0Trk1Coll).at(il3).first->pt() != T_hlt_TrkMPt) continue;
-   			      T_hlt_TrkMd0Sign = d0Trk1Coll->at(il3).second;
-   			    }
-   			    for(unsigned int il3=0; il3< (*LSigmaColl).size(); ++il3) {
-   			      if ((*LSigmaColl).at(il3).first->pt() != T_hlt_TrkMPt) continue;
-   			      T_hlt_JpsiTkMLSigma = LSigmaColl->at(il3).second;
-   			    }
-   			    for(unsigned int il3=0; il3< (*CosineColl).size(); ++il3) {
-   			      if ((*CosineColl).at(il3).first->pt() != T_hlt_TrkMPt) continue;
-   			      T_hlt_JpsiTkMCosBS = CosineColl->at(il3).second;
-   			    }
-   			    for(unsigned int il3=0; il3< (*VertexColl).size(); ++il3) {
-   			      if ((*VertexColl).at(il3).first->pt() != T_hlt_TrkMPt) continue;
-   			      T_hlt_JpsiTkMCLTest = VertexColl->at(il3).second;
-   			    }
-   			  }  
+              if (T_hlt_TrkMPt!=0){
+                for(unsigned int il3=0; il3< (*d0Trk1Coll).size(); ++il3) {
+                  if ((*d0Trk1Coll).at(il3).first->pt() != T_hlt_TrkMPt) continue;
+                  T_hlt_TrkMd0Sign = d0Trk1Coll->at(il3).second;
+                }
+                for(unsigned int il3=0; il3< (*LSigmaColl).size(); ++il3) {
+                  if ((*LSigmaColl).at(il3).first->pt() != T_hlt_TrkMPt) continue;
+                  T_hlt_JpsiTkMLSigma = LSigmaColl->at(il3).second;
+                }
+                for(unsigned int il3=0; il3< (*CosineColl).size(); ++il3) {
+                  if ((*CosineColl).at(il3).first->pt() != T_hlt_TrkMPt) continue;
+                  T_hlt_JpsiTkMCosBS = CosineColl->at(il3).second;
+                }
+                for(unsigned int il3=0; il3< (*VertexColl).size(); ++il3) {
+                  if ((*VertexColl).at(il3).first->pt() != T_hlt_TrkMPt) continue;
+                  T_hlt_JpsiTkMCLTest = VertexColl->at(il3).second;
+                }
+                 }  
               
               outTree_ -> Fill();            
             }
@@ -770,25 +770,25 @@ void JpsiTrkTreeMaker::beginJob() {
   outTree_->Branch("T_hlt_JpsiTkPosition_x"        , &T_hlt_JpsiTkPosition_x        );
   outTree_->Branch("T_hlt_JpsiTkPosition_y"        , &T_hlt_JpsiTkPosition_y        );
   outTree_->Branch("T_hlt_JpsiTkPosition_z"        , &T_hlt_JpsiTkPosition_z        );
-  outTree_->Branch("T_hlt_JpsiTkPositionError_x"   , &T_hlt_JpsiTkPositionError_x   ) ;
+  outTree_->Branch("T_hlt_JpsiTkPositionError_x"   , &T_hlt_JpsiTkPositionError_x   );
   outTree_->Branch("T_hlt_JpsiTkPositionError_y"   , &T_hlt_JpsiTkPositionError_y   );
   outTree_->Branch("T_hlt_JpsiTkPositionError_z"   , &T_hlt_JpsiTkPositionError_z   );
   outTree_->Branch("T_JpsiTkTkVtx_hltReco_dx"      , &T_JpsiTkTkVtx_hltReco_dx      );
   outTree_->Branch("T_JpsiTkTkVtx_hltReco_dy"      , &T_JpsiTkTkVtx_hltReco_dy      );
   outTree_->Branch("T_JpsiTkTkVtx_hltReco_dz"      , &T_JpsiTkTkVtx_hltReco_dz      );
 
-  outTree_->Branch("T_hlt_JpsiTkCL"                , &T_hlt_JpsiTkCL             	);
-  outTree_->Branch("T_hlt_JpsiTkPCLTest"           , &T_hlt_JpsiTkPCLTest          	);
-  outTree_->Branch("T_hlt_JpsiTkMCLTest"           , &T_hlt_JpsiTkMCLTest          	);
-  outTree_->Branch("T_hlt_JpsiTkPLSigma"           , &T_hlt_JpsiTkPLSigma        	);
-  outTree_->Branch("T_hlt_JpsiTkPCosBS"            , &T_hlt_JpsiTkPCosBS          	);
-  outTree_->Branch("T_hlt_JpsiTkMLSigma"           , &T_hlt_JpsiTkMLSigma        	);
-  outTree_->Branch("T_hlt_JpsiTkMCosBS"            , &T_hlt_JpsiTkMCosBS          	);
+  outTree_->Branch("T_hlt_JpsiTkCL"                , &T_hlt_JpsiTkCL                );
+  outTree_->Branch("T_hlt_JpsiTkPCLTest"           , &T_hlt_JpsiTkPCLTest           );
+  outTree_->Branch("T_hlt_JpsiTkMCLTest"           , &T_hlt_JpsiTkMCLTest           );
+  outTree_->Branch("T_hlt_JpsiTkPLSigma"           , &T_hlt_JpsiTkPLSigma           );
+  outTree_->Branch("T_hlt_JpsiTkPCosBS"            , &T_hlt_JpsiTkPCosBS            );
+  outTree_->Branch("T_hlt_JpsiTkMLSigma"           , &T_hlt_JpsiTkMLSigma           );
+  outTree_->Branch("T_hlt_JpsiTkMCosBS"            , &T_hlt_JpsiTkMCosBS            );
 
-  outTree_->Branch("T_TrkP_hltRecoDR"              , &T_TrkP_hltRecoDR          	);
-  outTree_->Branch("T_TrkM_hltRecoDR"              , &T_TrkM_hltRecoDR          	);
+  outTree_->Branch("T_TrkP_hltRecoDR"              , &T_TrkP_hltRecoDR              );
+  outTree_->Branch("T_TrkM_hltRecoDR"              , &T_TrkM_hltRecoDR              );
 
-  outTree_->Branch("T_MatchMu1"                    , &T_MatchMu1           		    );
+  outTree_->Branch("T_MatchMu1"                    , &T_MatchMu1                    );
   outTree_->Branch("T_MatchMu2"                    , &T_MatchMu2                    );
   outTree_->Branch("T_MatchTrkP"                   , &T_MatchTrkP                   );
   outTree_->Branch("T_MatchTrkM"                   , &T_MatchTrkM                   );
@@ -806,10 +806,10 @@ void JpsiTrkTreeMaker::beginJob() {
   hists_["countEvents"  ] = outfile_->make<TH1F>("countEvents" , "countEvents"              ,    4,     0.,    4 );
   hists_["mumuMass_all" ] = outfile_->make<TH1F>("mumuMass_all", "mass"                     , 2000,     0.,   20 ); 
 
-  hists_["jpsiPt"  ] = outfile_->make<TH1F>("jpsiPt", "mass"                     ,  400,     0.,   40 ); 
-  hists_["JpsiLS"  ] = outfile_->make<TH1F>("JpsiLS", "mass"                     ,  400,     0.,   40 ); 
-  hists_["JpsiCos" ] = outfile_->make<TH1F>("JpsiCos", "mass"                    , 2000,    -1.,   1 ); 
-  hists_["JpsiCL"  ] = outfile_->make<TH1F>("JpsiCL", "mass"                     , 1000,     0.,   1 ); 
+  hists_["jpsiPt"       ] = outfile_->make<TH1F>("jpsiPt"      , "mass"                     ,  400,     0.,   40 ); 
+  hists_["JpsiLS"       ] = outfile_->make<TH1F>("JpsiLS"      , "mass"                     ,  400,     0.,   40 ); 
+  hists_["JpsiCos"      ] = outfile_->make<TH1F>("JpsiCos"     , "mass"                     , 2000,    -1.,    1 ); 
+  hists_["JpsiCL"       ] = outfile_->make<TH1F>("JpsiCL"      , "mass"                     , 1000,     0.,    1 ); 
 
 
   hists_["trkPt"        ] = outfile_->make<TH1F>("trkPt"       , "pt trk"                   ,  150,     0.,   15 );
