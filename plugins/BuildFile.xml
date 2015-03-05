@@ -1,0 +1,103 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/Utilities"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="DataFormats/MuonReco"/>
+<use   name="HLTrigger/HLTcore"/>
+<use   name="CLHEP"/>
+<use   name="root"/>
+<library   file="JpsiTrkTrkEfficiencyAnalyzer.cc" name="JpsiTrkTrkEfficiencyAnalyzer">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <use name="TrackingTools/IPTools"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="JpsiTrkTrkTreeMaker.cc" name="JpsiTrkTrkTreeMaker">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <use name="TrackingTools/IPTools"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="JpsiTrkTreeMaker.cc" name="JpsiTrkTreeMaker">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <use name="TrackingTools/IPTools"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="JpsiTreeMaker.cc" name="JpsiTreeMaker">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <use name="TrackingTools/IPTools"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="JpsiTrkTreeMaker_rate.cc" name="JpsiTrkTreeMaker_rate">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <use name="TrackingTools/IPTools"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="JpsiTrkTrkTreeMaker_rate.cc" name="JpsiTrkTrkTreeMaker_rate">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <use name="TrackingTools/IPTools"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="TrackComparison.cc" name="TrackComparison">
+  <use name="TrackingTools/TrajectoryState"/>
+  <use name="MagneticField/Engine"/>
+  <use name="MagneticField/Records"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackPropagation/SteppingHelixPropagator"/>
+  <use name="RecoMuon/Records"/>
+  <use name="RecoMuon/DetLayers"/>
+  <use name="TrackingTools/TransientTrack"/>
+  <use name="RecoVertex/KalmanVertexFit"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<!-- 
+<library   file="HLTMenuVersionProvider.cc" name="HLTMenuVersionProvider">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+ -->
