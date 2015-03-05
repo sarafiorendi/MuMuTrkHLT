@@ -160,13 +160,13 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
    
   // Handle to the online d0 vtx collection
   edm::Handle< reco::RecoChargedCandidateDoubleMap > d0Trk1Coll; 
-  event.getByLabel("hltLowMassNonResonantTkVertexProducer", "d0firstTrk",  d0Trk1Coll);
+  event.getByLabel(MumuVtxProdTag_.label(), "d0firstTrk",  d0Trk1Coll);
   edm::Handle< reco::RecoChargedCandidateDoubleMap > LSigmaColl; 
-  event.getByLabel("hltLowMassNonResonantTkVertexProducer", "LSigma"    , LSigmaColl);
+  event.getByLabel(MumuVtxProdTag_.label(), "LSigma"    , LSigmaColl);
   edm::Handle< reco::RecoChargedCandidateDoubleMap > CosineColl; 
-  event.getByLabel("hltLowMassNonResonantTkVertexProducer", "Cosine"    , CosineColl);
+  event.getByLabel(MumuVtxProdTag_.label(), "Cosine"    , CosineColl);
   edm::Handle< reco::RecoChargedCandidateDoubleMap > VertexColl; 
-  event.getByLabel("hltLowMassNonResonantTkVertexProducer", "VertexCL"  , VertexColl);
+  event.getByLabel(MumuVtxProdTag_.label(), "VertexCL"  , VertexColl);
   
   T_Run    = event.id().run();
   T_Lumi   = event.id().luminosityBlock();
@@ -485,12 +485,12 @@ void JpsiTrkTreeMaker::analyze(const edm::Event &event, const edm::EventSetup &e
                   T_JpsiTkTkVtx_hltReco_dx      = idx;
                   T_JpsiTkTkVtx_hltReco_dy      = idy;
                   T_JpsiTkTkVtx_hltReco_dz      = idz;
-                  T_hlt_JpsiTkPosition_x      = hltVertices.at(vtxIt).position().x();
-                  T_hlt_JpsiTkPosition_y      = hltVertices.at(vtxIt).position().y();
-                  T_hlt_JpsiTkPosition_z      = hltVertices.at(vtxIt).position().z();
-                  T_hlt_JpsiTkPositionError_x = hltVertices.at(vtxIt).xError();
-                  T_hlt_JpsiTkPositionError_y = hltVertices.at(vtxIt).yError();
-                  T_hlt_JpsiTkPositionError_z = hltVertices.at(vtxIt).zError();
+                  T_hlt_JpsiTkPosition_x        = hltVertices.at(vtxIt).position().x();
+                  T_hlt_JpsiTkPosition_y        = hltVertices.at(vtxIt).position().y();
+                  T_hlt_JpsiTkPosition_z        = hltVertices.at(vtxIt).position().z();
+                  T_hlt_JpsiTkPositionError_x   = hltVertices.at(vtxIt).xError();
+                  T_hlt_JpsiTkPositionError_y   = hltVertices.at(vtxIt).yError();
+                  T_hlt_JpsiTkPositionError_z   = hltVertices.at(vtxIt).zError();
                   T_hlt_JpsiTkCL = TMath::Prob(hltVertices.at(vtxIt).chi2(), hltVertices.at(vtxIt).ndof() );
 //                   hlt_secondaryVertex    = hltVertices.at(vtxIt).position();
 //                   hlt_secondaryVertexErr = hltVertices.at(vtxIt).positionError();
