@@ -1,0 +1,181 @@
+
+void BHltNtuples::fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands ,
+                               const edm::Event                                        & event )
+{
+  for( unsigned int il3 = 0; il3 < l3cands->size(); ++il3) 
+  {
+    HLTMuCand theL3Mu;
+
+    reco::RecoChargedCandidateRef candref(l3cands, il3);
+    theL3Mu.pt      = candref -> pt();
+    theL3Mu.eta     = candref -> eta();
+    theL3Mu.phi     = candref -> phi();
+    theL3Mu.charge  = candref -> charge();
+
+    event_.hlt_mu.push_back(theL3Mu);
+  }
+}
+
+
+void BHltNtuples::fillHltTracks(const edm::Handle<reco::RecoChargedCandidateCollection> & trkcands ,
+                                const edm::Event                                        & event )
+{
+
+  bool d0_valid = false;
+  edm::Handle<reco::RecoChargedCandidateDoubleMap > d0TrkColl; 
+  if   (event.getByLabel(tkVtxTag_.label(), "d0firstTrk",  d0TrkColl)) d0_valid = true;
+  else edm::LogWarning("") << "Online d0 collection not found !!!";
+
+  bool LS_valid = false;
+  edm::Handle< reco::RecoChargedCandidateDoubleMap > LSigmaColl; 
+  if   (event.getByLabel(tkVtxTag_.label(), "LSigma",  LSigmaColl)) LS_valid = true;
+  else edm::LogWarning("") << "Online LS collection not found !!!";
+
+  bool Cos_valid = false;
+  edm::Handle< reco::RecoChargedCandidateDoubleMap > CosineColl; 
+  if   (event.getByLabel(tkVtxTag_.label(), "Cosine",  CosineColl)) Cos_valid = true;
+  else edm::LogWarning("") << "Online cosine collection not found !!!";
+
+  bool CL_valid = false;
+  edm::Handle< reco::RecoChargedCandidateDoubleMap > VertexColl; 
+  if   (event.getByLabel(tkVtxTag_.label(), "VertexCL",  VertexColl)) CL_valid = true;
+  else edm::LogWarning("") << "Online vertex CL collection not found !!!";
+
+
+  for( unsigned int itk = 0; itk < trkcands->size(); ++itk) 
+  {
+    HLTTkCand theTk;
+
+    reco::RecoChargedCandidateRef candref(trkcands, itk);
+    theTk.pt      = candref -> pt();
+    theTk.eta     = candref -> eta();
+    theTk.phi     = candref -> phi();
+    theTk.charge  = candref -> charge();
+    
+    if (d0_valid){
+      for(unsigned int id0 = 0; id0 < (*d0TrkColl).size(); ++id0) {
+        if ((*d0TrkColl).at(id0).first->pt() != candref -> pt()) continue;
+        theTk.d0Sign = d0TrkColl->at(id0).second;
+        break;
+      }
+    }
+    if (LS_valid){
+      for(unsigned int il3 = 0; il3 < (*LSigmaColl).size(); ++il3) {
+        if ((*LSigmaColl).at(il3).first->pt() != candref -> pt()) continue;
+        theTk.LSigma = LSigmaColl->at(il3).second;
+      }
+    }    
+    if (Cos_valid){
+      for(unsigned int ic = 0; ic < (*CosineColl).size(); ++ic) {
+        if ((*CosineColl).at(ic).first->pt() != candref -> pt()) continue;
+        theTk.CosBS = CosineColl->at(ic).second;
+      }
+    }    
+    if (CL_valid){
+      for(unsigned int ic = 0; ic < (*VertexColl).size(); ++ic) {
+        if ((*VertexColl).at(ic).first->pt() != candref -> pt()) continue;
+        theTk.CL = VertexColl->at(ic).second;
+      }
+    }    
+    
+    event_.hlt_tk.push_back(theTk);
+  }
+}
+
+
+
+void BHltNtuples::fillHltTkVtx(const edm::Handle<reco::VertexCollection>               & hltVertexHandle ,
+                               const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands,
+                               const edm::Handle<reco::RecoChargedCandidateCollection> & trkcands ,
+                               const edm::Event                         & event )
+{
+
+  // Handle to the online dimuon+trk vtx collection
+//   edm::Handle<reco::VertexCollection> hltVertexHandle; 
+//   try   { event.getByLabel(MumuVtxProdTag_, hltVertexHandle);}
+//   catch (...) { std::cout << "online vtx collection not found" << std::endl; return;}
+  const reco::VertexCollection & hltVertices = *hltVertexHandle.product();
+
+  HLTMuMuTkVtxCand theVtx;
+  for (unsigned ivtx = 0 ;  ivtx < hltVertices.size(); ivtx++){
+    theVtx.x  = hltVertices.at(ivtx).position().x();
+    theVtx.y  = hltVertices.at(ivtx).position().y();
+    theVtx.z  = hltVertices.at(ivtx).position().z();
+
+    theVtx.ex = hltVertices.at(ivtx).xError();
+    theVtx.ey = hltVertices.at(ivtx).yError();
+    theVtx.ez = hltVertices.at(ivtx).zError();
+    
+    theVtx.CL = TMath::Prob(hltVertices.at(ivtx).chi2(), hltVertices.at(ivtx).ndof() );
+    
+    bool foundMu0 = false;
+    bool foundMu1 = false;
+    bool foundTk  = false;
+
+    reco::Vertex::trackRef_iterator trki;
+    for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
+    {
+	   reco::RecoChargedCandidateRef tmp1Ref(l3cands, (*trki).key());
+	   if (! (tmp1Ref -> track().isNull()) && !foundMu0 )  {
+	     theVtx.mu1pt = tmp1Ref -> track() -> pt();
+         foundMu0 = true;
+       }
+       else if (! (tmp1Ref -> track().isNull()) && !foundMu1 ){
+	     theVtx.mu2pt = tmp1Ref -> track() -> pt();
+         foundMu1 = true;
+       }
+
+	   reco::RecoChargedCandidateRef tmp2Ref(trkcands, (*trki).key());
+	   if (! (tmp2Ref -> track().isNull()) && !foundTk )  {
+	     theVtx.tkpt = tmp2Ref -> track() -> pt();
+         foundTk = true;
+       }
+    }
+    event_.hlt_tkvtx.push_back(theVtx);
+  }
+    
+}
+
+
+
+void BHltNtuples::fillHltMuVtx(const edm::Handle<reco::VertexCollection>               & hltVertexHandle ,
+                               const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands,
+                               const edm::Event                                        & event )
+{
+
+  const reco::VertexCollection & hltVertices = *hltVertexHandle.product();
+
+  HLTMuMuVtxCand theVtx;
+  for (unsigned ivtx = 0 ;  ivtx < hltVertices.size(); ivtx++){
+    theVtx.x  = hltVertices.at(ivtx).position().x();
+    theVtx.y  = hltVertices.at(ivtx).position().y();
+    theVtx.z  = hltVertices.at(ivtx).position().z();
+
+    theVtx.ex = hltVertices.at(ivtx).xError();
+    theVtx.ey = hltVertices.at(ivtx).yError();
+    theVtx.ez = hltVertices.at(ivtx).zError();
+    
+    theVtx.CL = TMath::Prob(hltVertices.at(ivtx).chi2(), hltVertices.at(ivtx).ndof() );
+    
+    bool foundMu0 = false;
+    bool foundMu1 = false;
+
+    reco::Vertex::trackRef_iterator trki;
+    for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
+    {
+	   reco::RecoChargedCandidateRef tmp1Ref(l3cands, (*trki).key());
+	   if (! (tmp1Ref -> track().isNull()) && !foundMu0 )  {
+	     theVtx.mu1pt = tmp1Ref -> track() -> pt();
+         foundMu0 = true;
+       }
+       else if (! (tmp1Ref -> track().isNull()) && !foundMu1 ){
+	     theVtx.mu2pt = tmp1Ref -> track() -> pt();
+         foundMu1 = true;
+       }
+    }
+    event_.hlt_muvtx.push_back(theVtx);
+  }
+    
+}
+
+
