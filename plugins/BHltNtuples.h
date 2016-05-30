@@ -173,6 +173,7 @@ class BHltNtuples : public edm::EDAnalyzer {
   double thirdTrackMass_   ;
   double fourthTrackMass_  ;
   bool   skimJpsiDisplaced_;
+  bool   doOffline_;
 
   double maxEta_;
   double minPtTrk_;

@@ -207,6 +207,7 @@ public:
 
   bool find( const std::string & path ) {
 	for ( std::vector<std::string>::const_iterator it = triggers.begin(); it != triggers.end(); ++it ) {
+// 	  std::cout << it << std::endl;
       if ( it-> compare(path) == 0) return true;
 //       if ( it->find ( path ) != std::string::npos ) return true;
 	}

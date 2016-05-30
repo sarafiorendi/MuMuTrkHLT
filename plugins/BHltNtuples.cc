@@ -50,6 +50,7 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
   thirdTrackMass_         (cfg.getUntrackedParameter<double>("thirdTrkMass")),  //kaon mass
   fourthTrackMass_        (cfg.getUntrackedParameter<double>("fourthTrkMass")), //pion mass
   skimJpsiDisplaced_      (cfg.getUntrackedParameter<bool>("displacedJpsi")),
+  doOffline_              (cfg.getUntrackedParameter<bool>("doOffline")),
 
   maxEta_                 (cfg.getUntrackedParameter<double>("maxEta")), 
   minPtTrk_               (cfg.getUntrackedParameter<double>("minPtTrk")),
@@ -142,17 +143,25 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
 //     edm::LogError("") << "Trigger collection for tag muon not found !!!";
 
 
+  if (doOffline_){
+    
+    // Fill vertex info
+    edm::Handle<reco::VertexCollection> vtxColl; 
+    event.getByToken(offlinePVToken_, vtxColl);
+    for(reco::VertexCollection::const_iterator it = vtxColl->begin(); it != vtxColl->end(); ++it) {
+      if( !it->isValid())  continue;
+      nGoodVtx++;
+    }
+    event_.nVtx = nGoodVtx;
 
-  // Fill vertex info
-  edm::Handle<reco::VertexCollection> vtxColl; 
-  event.getByToken(offlinePVToken_, vtxColl);
-  for(reco::VertexCollection::const_iterator it = vtxColl->begin(); it != vtxColl->end(); ++it) {
-    if( !it->isValid())  continue;
-    nGoodVtx++;
+    // Handle the offline collections and fill offline b0s
+    edm::Handle<reco::MuonCollection> muons;
+    event.getByToken(offlineMuonsToken_,  muons);
+    edm::Handle<reco::TrackCollection >   tracks;
+    event.getByToken(offlineTksToken_,    tracks);
+    fillB0s(muons, tracks, event, eventSetup );
+
   }
-
-  event_.nVtx = nGoodVtx;
-
   
   // Fill MC GEN info
   if (!event.isRealData()) {
@@ -161,18 +170,6 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
       fillGen(genParticles, event);
   }  
   
-  ////////
-  // ADD DO OFFLINE AND CHANGE NAME
-  ////////
-
-
-  // Handle the offline collections and fill offline b0s
-  edm::Handle<reco::MuonCollection> muons;
-  event.getByToken(offlineMuonsToken_,  muons);
-  edm::Handle<reco::TrackCollection >   tracks;
-  event.getByToken(offlineTksToken_,    tracks);
-  fillB0s(muons, tracks, event, eventSetup );
-
 
   // Handle the online muon collection and fill online muons
   edm::Handle<reco::RecoChargedCandidateCollection> l3cands;
