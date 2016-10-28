@@ -11,6 +11,7 @@
 #pragma link C++ class B0Cand+;
 #pragma link C++ class HLTMuCand+;
 #pragma link C++ class HLTTkCand+;
+#pragma link C++ class HLTDimuonCand+;
 #pragma link C++ class HLTMuMuVtxCand+;
 #pragma link C++ class HLTMuMuTkVtxCand+;
 #pragma link C++ class HLTObjCand+;
@@ -19,6 +20,7 @@
 #pragma link C++ class std::vector<B0Cand>+;
 #pragma link C++ class std::vector<HLTMuCand>+;
 #pragma link C++ class std::vector<HLTTkCand>+;
+#pragma link C++ class std::vector<HLTDimuonCand>+;
 #pragma link C++ class std::vector<HLTMuMuVtxCand>+;
 #pragma link C++ class std::vector<HLTMuMuTkVtxCand>+;
 #pragma link C++ class std::vector<HLTObjCand>+;

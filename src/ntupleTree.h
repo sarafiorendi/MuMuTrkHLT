@@ -125,6 +125,26 @@ public:
 };
 
 
+class HLTDimuonCand {
+public:
+
+  Float_t  DCA     ;  
+  Float_t  mu1pt   ;  
+  Float_t  mu2pt   ;  
+  Float_t  mu1eta  ;  
+  Float_t  mu2eta  ;  
+  Float_t  mu1phi  ;  
+  Float_t  mu2phi  ;  
+  Float_t  charge  ;  
+
+  HLTDimuonCand(){};
+  virtual ~HLTDimuonCand(){};
+
+  ClassDef(HLTDimuonCand,1)
+
+};
+
+
 
 class HLTMuMuVtxCand {
 public:
@@ -239,6 +259,7 @@ public:
 
   std::vector <HLTMuCand>           hlt_mu;      
   std::vector <HLTTkCand>           hlt_tk;      
+  std::vector <HLTDimuonCand>       hlt_dimu;
   std::vector <HLTMuMuVtxCand>      hlt_muvtx;      
   std::vector <HLTMuMuTkVtxCand>    hlt_tkvtx;      
      

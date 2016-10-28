@@ -36,6 +36,7 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
     l3candToken_            (consumes<reco::RecoChargedCandidateCollection>(l3candTag_)), 
   tkcandTag_              (cfg.getParameter<edm::InputTag>("TkCandidatesTag")),
     tkcandToken_            (consumes<reco::RecoChargedCandidateCollection>(tkcandTag_)), 
+    
 
   mumuVtxTag_             (cfg.getUntrackedParameter<edm::InputTag>("MuMuVtxTag")),
     mumuVtxToken_           (consumes<reco::VertexCollection>(mumuVtxTag_)), 
@@ -46,6 +47,11 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
     offlineMuonsToken_      (consumes<reco::MuonCollection>(offlineMuonsTag_)), 
   offlineTksTag_          (cfg.getUntrackedParameter<edm::InputTag>("OfflineTkTag")),
     offlineTksToken_        (consumes<reco::TrackCollection>(offlineTksTag_)), 
+
+    d0token_                (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "d0firstTrk",  "REHLT")) ),   
+    lsToken_                (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "LSigma",      "REHLT")) ),   
+    cosToken_               (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "Cosine",      "REHLT")) ),   
+    vertexToken_            (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "VertexCL",    "REHLT")) ),   
 
   thirdTrackMass_         (cfg.getUntrackedParameter<double>("thirdTrkMass")),  //kaon mass
   fourthTrackMass_        (cfg.getUntrackedParameter<double>("fourthTrkMass")), //pion mass
@@ -173,8 +179,10 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
 
   // Handle the online muon collection and fill online muons
   edm::Handle<reco::RecoChargedCandidateCollection> l3cands;
-  if (event.getByToken(l3candToken_, l3cands))
-    fillHltMuons(l3cands, event);
+  if (event.getByToken(l3candToken_, l3cands)){
+    fillHltMuons  (l3cands, event);
+    fillHltDiMuons(l3cands, event, eventSetup);
+  }  
   else
     edm::LogWarning("") << "Online muon collection not found !!!";
 
@@ -182,7 +190,7 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   // Handle the online track collection and fill online tracks
   edm::Handle<reco::RecoChargedCandidateCollection> tkcands;
   if (event.getByToken(tkcandToken_, tkcands))
-    fillHltTracks(tkcands, event);
+    fillHltTracks(tkcands, event, consumesCollector(), tkcandTag_);
   else
     edm::LogWarning("") << "Online track collection not found !!!";
 
@@ -191,7 +199,7 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   edm::Handle<reco::VertexCollection> hlt_muvtx;
   if (event.getByToken(mumuVtxToken_, hlt_muvtx) && 
       event.getByToken( l3candToken_, l3cands  ) )
-    fillHltMuVtx(hlt_muvtx, l3cands, event);
+    fillHltMuVtx(hlt_muvtx, l3cands, event, eventSetup);
   else
     edm::LogWarning("") << "Online dimuon vertex collection not found !!!";
 

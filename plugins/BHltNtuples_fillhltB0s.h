@@ -16,29 +16,87 @@ void BHltNtuples::fillHltMuons(const edm::Handle<reco::RecoChargedCandidateColle
   }
 }
 
+void BHltNtuples::fillHltDiMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands ,
+                                 const edm::Event                                        & event   ,
+                                 const edm::EventSetup                                   & eventSetup
+                                )
+{
+  if (l3cands->size() < 2) return;
+  HLTDimuonCand theDimuon;
+  
+  //get the b field
+  std::string mfName_ = "";
+  edm::ESHandle<MagneticField> bFieldHandle;
+  eventSetup.get<IdealMagneticFieldRecord>().get(mfName_, bFieldHandle);  
+
+  TrajectoryStateClosestToPoint mu1TS, mu2TS;
+  
+  for( unsigned int il3 = 0; il3 < l3cands->size(); ++il3) 
+  {
+//     HLTMuCand oneL3Mu;
+    reco::RecoChargedCandidateRef oneref(l3cands, il3);
+	reco::TrackRef tk1 = oneref->get<reco::TrackRef>();
+	reco::TransientTrack mu1TT(*tk1, &(*bFieldHandle));
+	mu1TS = mu1TT.impactPointTSCP();
+    
+    theDimuon.mu1pt  = oneref -> pt();
+	theDimuon.mu1eta = oneref -> eta();
+	theDimuon.mu1phi = oneref -> phi();
+	
+	theDimuon.DCA    = -20  ;
+
+	for( unsigned int jl3 = il3+1; jl3 < l3cands->size(); ++jl3) 
+	{
+      reco::RecoChargedCandidateRef tworef(l3cands, jl3);
+//       if ( tworef -> charge() * oneref -> charge() > 0) continue;
+	  reco::TrackRef tk2 = tworef->get<reco::TrackRef>();
+	  reco::TransientTrack mu2TT(*tk2, &(*bFieldHandle));
+	  mu2TS = mu2TT.impactPointTSCP();
+       
+      theDimuon.mu2pt  = tworef -> pt();
+      theDimuon.mu2eta = tworef -> eta();
+      theDimuon.mu2phi = tworef -> phi();
+      // DCA between the two muons
+	  if (mu1TS.isValid() && mu2TS.isValid()) {
+	    ClosestApproachInRPhi cApp;
+	    cApp.calculate(mu1TS.theState(), mu2TS.theState());
+	    if ( cApp.status()) theDimuon.DCA = cApp.distance()  ;
+	    else                theDimuon.DCA = -10  ;
+	  }
+	  
+	  theDimuon.charge =  tworef -> charge() * oneref -> charge();
+
+      event_.hlt_dimu.push_back(theDimuon);
+
+
+    }    
+  }
+}
 
 void BHltNtuples::fillHltTracks(const edm::Handle<reco::RecoChargedCandidateCollection> & trkcands ,
-                                const edm::Event                                        & event )
+                                const edm::Event                                        & event    ,
+                                edm::ConsumesCollector &&                                 iC       ,
+                                edm::InputTag                                           & tkcandTag_)
 {
 
   bool d0_valid = false;
   edm::Handle<reco::RecoChargedCandidateDoubleMap > d0TrkColl; 
-  if   (event.getByLabel(tkVtxTag_.label(), "d0firstTrk",  d0TrkColl)) d0_valid = true;
+  if   (event.getByToken(d0token_, d0TrkColl)) d0_valid = true;
   else edm::LogWarning("") << "Online d0 collection not found !!!";
 
   bool LS_valid = false;
   edm::Handle< reco::RecoChargedCandidateDoubleMap > LSigmaColl; 
-  if   (event.getByLabel(tkVtxTag_.label(), "LSigma",  LSigmaColl)) LS_valid = true;
+  if   (event.getByToken(lsToken_, LSigmaColl)) LS_valid = true;
   else edm::LogWarning("") << "Online LS collection not found !!!";
 
   bool Cos_valid = false;
   edm::Handle< reco::RecoChargedCandidateDoubleMap > CosineColl; 
-  if   (event.getByLabel(tkVtxTag_.label(), "Cosine",  CosineColl)) Cos_valid = true;
+  if   (event.getByToken(cosToken_, CosineColl)) Cos_valid = true;
   else edm::LogWarning("") << "Online cosine collection not found !!!";
 
   bool CL_valid = false;
   edm::Handle< reco::RecoChargedCandidateDoubleMap > VertexColl; 
-  if   (event.getByLabel(tkVtxTag_.label(), "VertexCL",  VertexColl)) CL_valid = true;
+  if   (event.getByToken(vertexToken_, VertexColl)) CL_valid = true;
   else edm::LogWarning("") << "Online vertex CL collection not found !!!";
 
 
@@ -112,26 +170,26 @@ void BHltNtuples::fillHltTkVtx(const edm::Handle<reco::VertexCollection>        
     bool foundMu1 = false;
     bool foundTk  = false;
 
-    reco::Vertex::trackRef_iterator trki;
-    for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
-    {
-	   reco::RecoChargedCandidateRef tmp1Ref(l3cands, (*trki).key());
-	   if (! (tmp1Ref -> track().isNull()) && !foundMu0 )  {
-	     theVtx.mu1pt = tmp1Ref -> track() -> pt();
-         foundMu0 = true;
-       }
-       else if (! (tmp1Ref -> track().isNull()) && !foundMu1 ){
-	     theVtx.mu2pt = tmp1Ref -> track() -> pt();
-         foundMu1 = true;
-       }
-
-	   reco::RecoChargedCandidateRef tmp2Ref(trkcands, (*trki).key());
-	   if (! (tmp2Ref -> track().isNull()) && !foundTk )  {
-	     theVtx.tkpt = tmp2Ref -> track() -> pt();
-         foundTk = true;
-       }
-    }
-    event_.hlt_tkvtx.push_back(theVtx);
+//     reco::Vertex::trackRef_iterator trki;
+//     for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
+//     {
+// 	   reco::RecoChargedCandidateRef tmp1Ref(l3cands, (*trki).key());
+// 	   if (! (tmp1Ref -> track().isNull()) && !foundMu0 )  {
+// 	     theVtx.mu1pt = tmp1Ref -> track() -> pt();
+//          foundMu0 = true;
+//        }
+//        else if (! (tmp1Ref -> track().isNull()) && !foundMu1 ){
+// 	     theVtx.mu2pt = tmp1Ref -> track() -> pt();
+//          foundMu1 = true;
+//        }
+// 
+// 	   reco::RecoChargedCandidateRef tmp2Ref(trkcands, (*trki).key());
+// 	   if (! (tmp2Ref -> track().isNull()) && !foundTk )  {
+// 	     theVtx.tkpt = tmp2Ref -> track() -> pt();
+//          foundTk = true;
+//        }
+//     }
+//     event_.hlt_tkvtx.push_back(theVtx);
   }
     
 }
@@ -140,7 +198,8 @@ void BHltNtuples::fillHltTkVtx(const edm::Handle<reco::VertexCollection>        
 
 void BHltNtuples::fillHltMuVtx(const edm::Handle<reco::VertexCollection>               & hltVertexHandle ,
                                const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands,
-                               const edm::Event                                        & event )
+                               const edm::Event                                        & event,
+                               const edm::EventSetup                                   & eventSetup)
 {
 
   const reco::VertexCollection & hltVertices = *hltVertexHandle.product();

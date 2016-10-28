@@ -35,9 +35,12 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 #include "TrackingTools/PatternTools/interface/TSCBLBuilderNoMaterial.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+
+
 
 #include <map>
 #include <string>
@@ -84,8 +87,15 @@ class BHltNtuples : public edm::EDAnalyzer {
                      const edm::Event   & 
                     );
   void fillHltTracks(const edm::Handle<reco::RecoChargedCandidateCollection> &,
-                     const edm::Event   & 
+                     const edm::Event   &                                     ,
+                     edm::ConsumesCollector &&,
+                     edm::InputTag &
                     );
+
+  void fillHltDiMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & ,
+                      const edm::Event                                        & ,
+                      const edm::EventSetup                                   & 
+                     );
 
   void fillHltTkVtx (const edm::Handle<reco::VertexCollection> &,
                      const edm::Handle<reco::RecoChargedCandidateCollection> &,
@@ -95,7 +105,8 @@ class BHltNtuples : public edm::EDAnalyzer {
 
   void fillHltMuVtx (const edm::Handle<reco::VertexCollection> &,
                      const edm::Handle<reco::RecoChargedCandidateCollection> &,
-                     const edm::Event   & 
+                     const edm::Event   & ,
+                     const edm::EventSetup & 
                     );
 
   void fillGen      (const edm::Handle<reco::GenParticleCollection> &  ,
@@ -146,6 +157,11 @@ class BHltNtuples : public edm::EDAnalyzer {
   edm::InputTag offlineTksTag_;
   edm::EDGetTokenT<reco::TrackCollection> offlineTksToken_;
 
+  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> d0token_;
+  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> lsToken_;
+  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> cosToken_;
+  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> vertexToken_;
+ 
   ntupleEvent event_;
   std::map<std::string,TTree*> outTree_;
 
@@ -203,6 +219,7 @@ void BHltNtuples::beginEvent()
 
   event_.hlt_mu.clear();
   event_.hlt_tk.clear();
+  event_.hlt_dimu.clear();
   event_.hlt_muvtx.clear();
   event_.hlt_tkvtx.clear();
   
