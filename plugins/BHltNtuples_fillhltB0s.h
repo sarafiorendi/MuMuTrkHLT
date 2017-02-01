@@ -166,10 +166,14 @@ void BHltNtuples::fillHltTkVtx(const edm::Handle<reco::VertexCollection>        
     
     theVtx.CL = TMath::Prob(hltVertices.at(ivtx).chi2(), hltVertices.at(ivtx).ndof() );
     
-    bool foundMu0 = false;
-    bool foundMu1 = false;
-    bool foundTk  = false;
+    theVtx.mu1pt = -1;
+    theVtx.mu2pt = -1;
+    theVtx.tkpt  = -1;
 
+    // not working, missing RCCRef somehow
+//     bool foundMu0 = false;
+//     bool foundMu1 = false;
+//     bool foundTk  = false;
 //     reco::Vertex::trackRef_iterator trki;
 //     for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
 //     {
@@ -189,7 +193,7 @@ void BHltNtuples::fillHltTkVtx(const edm::Handle<reco::VertexCollection>        
 //          foundTk = true;
 //        }
 //     }
-//     event_.hlt_tkvtx.push_back(theVtx);
+    event_.hlt_tkvtx.push_back(theVtx);
   }
     
 }
