@@ -26,12 +26,16 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
     puToken_                (consumes<std::vector< PileupSummaryInfo>>(puTag_)), 
   offlinePVTag_           (cfg.getParameter<edm::InputTag>("offlineVtx")), 
     offlinePVToken_         (consumes<reco::VertexCollection>(offlinePVTag_)), 
-  beamspotTag_           (cfg.getParameter<edm::InputTag>("beamspot")), 
+  beamspotTag_            (cfg.getParameter<edm::InputTag>("beamspot")), 
     beamspotToken_         (consumes<reco::BeamSpot>(beamspotTag_)), 
+  lumiScalerTag_          (cfg.getUntrackedParameter<edm::InputTag>("lumiScalerTag")),
+    lumiScalerToken_        (consumes<LumiScalersCollection>(lumiScalerTag_)),   
 
   genTag_                 (cfg.getUntrackedParameter<edm::InputTag>("genParticlesTag")),
     genToken_               (consumes<reco::GenParticleCollection>(genTag_)), 
 
+  l1candTag_              (cfg.getUntrackedParameter<edm::InputTag>("L1Candidates")),
+    l1candToken_            (consumes<l1t::MuonBxCollection>(l1candTag_)),
   l3candTag_              (cfg.getParameter<edm::InputTag>("L3CandidatesTag")),
     l3candToken_            (consumes<reco::RecoChargedCandidateCollection>(l3candTag_)), 
   tkcandTag_              (cfg.getParameter<edm::InputTag>("TkCandidatesTag")),
@@ -60,7 +64,8 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
 
   maxEta_                 (cfg.getUntrackedParameter<double>("maxEta")), 
   minPtTrk_               (cfg.getUntrackedParameter<double>("minPtTrk")),
-  mind0Sign_              (cfg.getUntrackedParameter<double>("mind0Sign")) 
+  mind0Sign_              (cfg.getUntrackedParameter<double>("mind0Sign"))
+
 {
 }
 
@@ -160,19 +165,32 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     }
     event_.nVtx = nGoodVtx;
 
+	// Fill bx and inst lumi info
+	if (event.isRealData()) {
+	  event_.bxId  = event.bunchCrossing();
+
+	  if (lumiScalerTag_.label() != "none")
+	  {
+	    edm::Handle<LumiScalersCollection> lumiScaler;
+	    event.getByToken(lumiScalerToken_, lumiScaler);
+
+  	    if (lumiScaler->begin() != lumiScaler->end())
+		  event_.instLumi = lumiScaler->begin()->instantLumi();
+	  }
+	}
     // Handle the offline collections and fill offline b0s
     edm::Handle<reco::MuonCollection> muons;
     event.getByToken(offlineMuonsToken_,  muons);
     edm::Handle<reco::TrackCollection >   tracks;
     event.getByToken(offlineTksToken_,    tracks);
-    fillB0s(muons, tracks, event, eventSetup );
+    fillB0s(muons, tracks, vtxColl, event, eventSetup );
 
   }
   
   // Fill MC GEN info
   if (!event.isRealData()) {
-    edm::Handle<reco::GenParticleCollection> genParticles;
-    event.getByLabel("genParticles", genParticles);
+  edm::Handle<reco::GenParticleCollection> genParticles;
+  event.getByToken(genToken_, genParticles);
       fillGen(genParticles, event);
   }  
   
@@ -213,6 +231,16 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   else
     edm::LogWarning("") << "Online muon-trk vertex collection not found !!!";
   
+
+  // Handle the online muon collection and fill L1 muons
+  edm::Handle<l1t::MuonBxCollection> l1cands;
+  if (event.getByToken(l1candToken_, l1cands))
+    fillL1Muons(l1cands, event);
+  else
+    edm::LogWarning("") << "Online L1 muon collection not found !!!";
+
+
+
   outTree_["ntupleTree"] -> Fill();
 }
 

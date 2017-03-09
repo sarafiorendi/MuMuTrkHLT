@@ -16,16 +16,19 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/HLTReco/interface/TriggerObject.h"
+#include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateDoubleAssociation.h"
+#include "DataFormats/Scalers/interface/LumiScalers.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -79,8 +82,13 @@ class BHltNtuples : public edm::EDAnalyzer {
 
   void fillB0s      (const edm::Handle<reco::MuonCollection> &,
                      const edm::Handle<reco::TrackCollection> &,
+                     const edm::Handle<reco::VertexCollection >& ,
                      const edm::Event      &, 
                      const edm::EventSetup & 
+                    );
+
+  void fillL1Muons  (const edm::Handle<l1t::MuonBxCollection> &,
+                     const edm::Event   &
                     );
 
   void fillHltMuons (const edm::Handle<reco::RecoChargedCandidateCollection> &,
@@ -138,10 +146,14 @@ class BHltNtuples : public edm::EDAnalyzer {
   edm::EDGetTokenT<reco::VertexCollection> offlinePVToken_;
   edm::InputTag beamspotTag_;
   edm::EDGetTokenT<reco::BeamSpot> beamspotToken_;
+  edm::InputTag lumiScalerTag_;
+  edm::EDGetTokenT<LumiScalersCollection> lumiScalerToken_; 
  
   edm::InputTag genTag_;
   edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
 
+  edm::InputTag l1candTag_;
+  edm::EDGetTokenT<l1t::MuonBxCollection> l1candToken_; 
   edm::InputTag l3candTag_;
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> l3candToken_;
   edm::InputTag tkcandTag_;
@@ -161,7 +173,7 @@ class BHltNtuples : public edm::EDAnalyzer {
   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> lsToken_;
   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> cosToken_;
   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> vertexToken_;
- 
+
   ntupleEvent event_;
   std::map<std::string,TTree*> outTree_;
 

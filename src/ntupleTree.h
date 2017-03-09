@@ -16,6 +16,20 @@ public:
   Float_t pt; 
   Float_t eta; 
   Float_t phi; 
+  
+  Float_t mumPt ;
+  Float_t mumEta;
+  Float_t mumPhi;
+  Float_t mupPt ;
+  Float_t mupEta;
+  Float_t mupPhi;
+  Float_t piPt  ;
+  Float_t piEta ;
+  Float_t piPhi ;
+  Float_t kPt   ;
+  Float_t kEta  ;
+  Float_t kPhi  ;
+
   std::vector<Int_t>  pdgMother; 
   std::vector<Int_t>  pdgRealMother; 
 
@@ -85,6 +99,23 @@ public:
   virtual ~B0Cand(){};
 
   ClassDef(B0Cand,1)
+};
+
+
+class L1MuonCand {
+public:
+
+  Float_t pt;           
+  Float_t eta;          
+  Float_t phi;          
+  Int_t   charge;      
+  Int_t   quality;      
+  
+  L1MuonCand(){};
+  virtual ~L1MuonCand(){};
+
+  ClassDef(L1MuonCand,1)
+
 };
 
 
@@ -176,6 +207,7 @@ public:
   Float_t  tkpt   ;  
 
   Float_t  CL      ;  
+  Float_t  normchi2;  
 
   Float_t  x       ;  
   Float_t  y       ;  
@@ -192,7 +224,6 @@ public:
 };
 
 
-
 class HLTObjCand {
 public:
 
@@ -207,9 +238,6 @@ public:
   ClassDef(HLTObjCand,1)
 
 };
-
-
-
 
 
 class HLTInfo {
@@ -250,6 +278,9 @@ public:
   Int_t   nTrks;   
   Float_t trueNI;   
 
+  Float_t bxId;
+  Float_t instLumi; 
+  
   Float_t primaryVertex[3];        
   Float_t cov_primaryVertex[3][3]; 
 
@@ -262,6 +293,8 @@ public:
   std::vector <HLTDimuonCand>       hlt_dimu;
   std::vector <HLTMuMuVtxCand>      hlt_muvtx;      
   std::vector <HLTMuMuTkVtxCand>    hlt_tkvtx;      
+
+  std::vector <L1MuonCand>          L1muons;      
      
   HLTInfo                           hlt;           
   HLTInfo                           hltTag;           

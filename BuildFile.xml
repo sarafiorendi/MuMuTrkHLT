@@ -2,10 +2,12 @@
 <use name="FWCore/Utilities"/>
 <use name="FWCore/ParameterSet"/>
 <use name="CommonTools/UtilAlgos"/>
+<use name="DataFormats/Common"/>
 <use name="DataFormats/MuonReco"/>
 <use name="HLTrigger/HLTcore"/>
 <use name="CLHEP"/>
 <use name="root"/>
+<use name="rootrflx"/>
 <use name="TrackingTools/TrajectoryState"/>
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>

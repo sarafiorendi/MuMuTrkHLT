@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muons ,
                             const edm::Handle<reco::TrackCollection >     & tracks,
+                            const edm::Handle<reco::VertexCollection >    & vtxColl,
                             const edm::Event                              & event ,
                             const edm::EventSetup                         & eventSetup)
 {
@@ -24,15 +25,17 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
   const MagneticField* magField = bFieldHandle.product();
   TSCBLBuilderNoMaterial blsBuilder;
 
+  const reco::VertexCollection pvColl  = *(vtxColl.product())  ;    
+
   // Loop muon collection
   for(std::vector<reco::Muon>::const_iterator mu1=muons->begin(); mu1!=muons->end(); ++mu1) 
   { 
-    if( muon::isLooseMuon( (*mu1) ) && (*mu1).pt() > 3 && fabs( (*mu1).eta() ) < 2.2) 
+    if( muon::isSoftMuon( (*mu1), pvColl[0] ) && (*mu1).pt() > 0 && fabs( (*mu1).eta() ) < 2.4) 
     {
       // Go on and look for the second tag muon
       for(std::vector<reco::Muon>::const_iterator mu2=mu1; mu2!=muons->end(); ++mu2) {
         if( mu2 == mu1 ) continue; 
-        if( muon::isLooseMuon( (*mu2)) && (*mu2).pt() > 3 && fabs( (*mu2).eta() ) < 2.2) 
+        if( muon::isSoftMuon( (*mu2), pvColl[0]) && (*mu2).pt() > 0 && fabs( (*mu2).eta() ) < 2.4) 
         {
           if(!( mu1->charge() * mu2->charge() < 0 ))         continue; 
           hists_["mumuMass_all"]->Fill( (mu1->p4() + mu2->p4()).mass() );
