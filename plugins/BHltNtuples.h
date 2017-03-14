@@ -229,6 +229,7 @@ void BHltNtuples::beginEvent()
   event_.genParticles.clear();
   event_.b0cands.clear();
 
+  event_.L1muons.clear();
   event_.hlt_mu.clear();
   event_.hlt_tk.clear();
   event_.hlt_dimu.clear();
