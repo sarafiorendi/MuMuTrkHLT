@@ -9,6 +9,7 @@
 #pragma link C++ class ntupleEvent+;
 #pragma link C++ class GenParticleCand+;
 #pragma link C++ class B0Cand+;
+#pragma link C++ class L1MuonCand+;
 #pragma link C++ class HLTMuCand+;
 #pragma link C++ class HLTTkCand+;
 #pragma link C++ class HLTDimuonCand+;
@@ -18,6 +19,7 @@
 #pragma link C++ class HLTInfo+;
 #pragma link C++ class std::vector<GenParticleCand>+;
 #pragma link C++ class std::vector<B0Cand>+;
+#pragma link C++ class std::vector<L1MuonCand>+;
 #pragma link C++ class std::vector<HLTMuCand>+;
 #pragma link C++ class std::vector<HLTTkCand>+;
 #pragma link C++ class std::vector<HLTDimuonCand>+;

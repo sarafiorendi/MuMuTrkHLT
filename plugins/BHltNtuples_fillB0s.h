@@ -160,6 +160,7 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               reco::Vertex vertex = tv;
               if (!tv.isValid()) continue;
               hists_["B0InvMass"]->Fill( pB.mass() );
+              if (pB.mass() > 8 && pbarB.mass() > 8.) continue;
 
               float JpsiTkTkCL = 0;
               if ((vertex.chi2()>=0.0) && (vertex.ndof()>0) )   
