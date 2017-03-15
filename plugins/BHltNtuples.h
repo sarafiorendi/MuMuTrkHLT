@@ -71,6 +71,8 @@ class BHltNtuples : public edm::EDAnalyzer {
 
   virtual void beginEvent();
 
+  typedef std::map<uint, reco::Track  >  selTracksDef ;  
+
  private:
 
   void fillHlt      (const edm::Handle<edm::TriggerResults> &, 

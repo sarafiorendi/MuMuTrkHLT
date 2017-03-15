@@ -99,7 +99,7 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   beginEvent();
   
   if (skimJpsiDisplaced_){
-    minJpsiPt_  = 6.9;
+//     minJpsiPt_  = 6.9;
     minJpsiCos_ = 0.9; 
     minJpsiLS_  =   3;
     minJpsiCL_  = 0.1;

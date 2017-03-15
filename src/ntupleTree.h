@@ -67,12 +67,12 @@ public:
   Float_t TrkPPt         ;  
   Float_t TrkPEta        ;  
   Float_t TrkPPhi        ;  
-  Float_t TrkPHQ         ;  
+//   Float_t TrkPHQ         ;  
   Float_t TrkPd0Sign     ;  
   Float_t TrkMPt         ;  
   Float_t TrkMEta        ;  
   Float_t TrkMPhi        ;  
-  Float_t TrkMHQ         ;  
+//   Float_t TrkMHQ         ;  
   Float_t TrkMd0Sign     ;  
 
 

@@ -21,18 +21,46 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
   //get the b field
   std::string mfName_ = "";
   edm::ESHandle<MagneticField> bFieldHandle;
-  eventSetup.get<IdealMagneticFieldRecord>().get(mfName_, bFieldHandle);  
+  eventSetup.get<IdealMagneticFieldRecord>().get("", bFieldHandle);  
   const MagneticField* magField = bFieldHandle.product();
   TSCBLBuilderNoMaterial blsBuilder;
 
   const reco::VertexCollection pvColl  = *(vtxColl.product())  ;    
 
-  // Loop muon collection
+  // preselection on tracks
+  selTracksDef qualityTracksPlus, qualityTracksMinus;
+  for (uint tracksIt =0 ;  tracksIt < tracks->size(); tracksIt++)
+  {
+    reco::TrackRef checkTrk(tracks,tracksIt) ;                                                
+    reco::Track itrk  = tracks->at(tracksIt) ;                                                
+    
+    if (!checkTrk->quality(reco::TrackBase::highPurity))                continue;
+    if (checkTrk->pt() < minPtTrk_ || fabs(checkTrk->eta())  > maxEta_) continue;            
+    
+    FreeTrajectoryState InitialFTS2 = initialFreeState(itrk, magField);
+    TrajectoryStateClosestToBeamLine tscb2( blsBuilder(InitialFTS2, *recoBeamSpotHandle) );
+    float trk_d0sig = tscb2.transverseImpactParameter().significance();
+    if (trk_d0sig  < mind0Sign_)    continue;
+
+    // check overlap with muon collection
+    bool flag = false ;                                                         
+    for (reco::MuonCollection::const_iterator mu =muons->begin(); mu!=muons->end(); mu++)                    
+    {                                                                
+      if (mu->track().get()!= 0 && mu->track().get() == checkTrk.get()) { flag=true; break; }                    
+    }                                                                
+    if (flag)   continue;            
+
+    if (itrk.charge() == 1)  qualityTracksPlus[tracksIt] = itrk;     
+    else                     qualityTracksMinus[tracksIt]= itrk;   
+  }
+
+
+  // Loop on muon collection
   for(std::vector<reco::Muon>::const_iterator mu1=muons->begin(); mu1!=muons->end(); ++mu1) 
   { 
     if( muon::isSoftMuon( (*mu1), pvColl[0] ) && (*mu1).pt() > 0 && fabs( (*mu1).eta() ) < 2.4) 
     {
-      // Go on and look for the second tag muon
+      // Go on and look for the second muon
       for(std::vector<reco::Muon>::const_iterator mu2=mu1; mu2!=muons->end(); ++mu2) {
         if( mu2 == mu1 ) continue; 
         if( muon::isSoftMuon( (*mu2), pvColl[0]) && (*mu2).pt() > 0 && fabs( (*mu2).eta() ) < 2.4) 
@@ -83,47 +111,31 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
           if (dimuonCL     < minJpsiCL_    ) continue;
 
           // Loop on track collection - trk 1
-          for (unsigned tracksIt =0 ;  tracksIt < tracks->size(); tracksIt++)
+          for (selTracksDef::const_iterator tracksIt=qualityTracksPlus.begin(); tracksIt!=qualityTracksPlus.end(); ++tracksIt)
           {
-            reco::Track itrk1       = tracks->at(tracksIt) ;                                                
-            
-            //charge = +1 
-            if (itrk1.charge() != 1)    continue;
+            reco::Track itrk1((*tracksIt).second) ;
             if (overlap(*mu1,itrk1))    continue;
             if (overlap(*mu2,itrk1))    continue;
             
             FreeTrajectoryState InitialFTS = initialFreeState(itrk1, magField);
             TrajectoryStateClosestToBeamLine tscb( blsBuilder(InitialFTS, *recoBeamSpotHandle) );
-            float trkP_d0sig = tscb.transverseImpactParameter().significance();
+            float trk1_d0sig = tscb.transverseImpactParameter().significance();
 
             hists_["trkPt"] -> Fill( itrk1.pt() );
-            hists_["D0sig"] -> Fill( trkP_d0sig );
+            hists_["D0sig"] -> Fill( trk1_d0sig );
  
-            // eta and pt cut
-            if (fabs(itrk1.eta()) > maxEta_   )                   continue;
-            if (itrk1.pt()        < minPtTrk_ )                   continue;
-            if (trkP_d0sig        < mind0Sign_)                   continue;
-            if (! itrk1.quality(reco::TrackBase::highPurity))     continue;
-
-            for (unsigned tracksIt2 = tracksIt + 1 ;  tracksIt2 < tracks->size(); tracksIt2++)
+            for (selTracksDef::const_iterator tracksIt2 = qualityTracksMinus.begin(); tracksIt2 != qualityTracksMinus.end(); ++tracksIt2)
             {
-              reco::Track itrk2       = tracks->at(tracksIt2) ;                                                
-              //charge = -1 
-              if (itrk2.charge() != -1)                           continue;
+              reco::Track itrk2((*tracksIt2).second) ;
               if (itrk2.charge()*itrk1.charge() != -1)            continue;
               if (overlap(*mu1,itrk2))                            continue;
               if (overlap(*mu2,itrk2))                            continue;
 
               FreeTrajectoryState InitialFTS2 = initialFreeState(itrk2, magField);
               TrajectoryStateClosestToBeamLine tscb2( blsBuilder(InitialFTS2, *recoBeamSpotHandle) );
-              float trkM_d0sig = tscb2.transverseImpactParameter().significance();
+              float trk2_d0sig = tscb2.transverseImpactParameter().significance();
               hists_["trkPt"] -> Fill(itrk2.pt()   );
-              hists_["D0sig"] -> Fill(trkM_d0sig   );
-              // eta and pt cut
-              if (fabs(itrk2.eta()) > maxEta_   )                 continue;
-              if (itrk2.pt()        < minPtTrk_ )                 continue;
-              if (trkM_d0sig        < mind0Sign_)                 continue;
-              if (! itrk2.quality(reco::TrackBase::highPurity))   continue;
+              hists_["D0sig"] -> Fill(trk2_d0sig   );
 
               reco::Particle::LorentzVector pB, pbarB, p1, p2, p3_k, p4_p, p3_p, p4_k, pKstar, pKstarBar;
 
@@ -147,6 +159,8 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               pKstar    = p3_k + p4_p;
               pKstarBar = p3_p + p4_k;
             
+              if (pB.mass() > 8 && pbarB.mass() > 8.) continue;
+
               // do the vertex fit
               std::vector<reco::TransientTrack> t_tks;
               t_tks.push_back((*theB).build(mu1->track().get()));
@@ -160,7 +174,6 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               reco::Vertex vertex = tv;
               if (!tv.isValid()) continue;
               hists_["B0InvMass"]->Fill( pB.mass() );
-              if (pB.mass() > 8 && pbarB.mass() > 8.) continue;
 
               float JpsiTkTkCL = 0;
               if ((vertex.chi2()>=0.0) && (vertex.ndof()>0) )   
@@ -206,14 +219,14 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               theB0.TrkPPt     = itrk1.pt( ) ;
               theB0.TrkPEta    = itrk1.eta() ;
               theB0.TrkPPhi    = itrk1.phi() ;
-              theB0.TrkPd0Sign = trkP_d0sig  ;
-              (itrk1.quality(reco::TrackBase::highPurity)) ? theB0.TrkPHQ = 1 : theB0.TrkPHQ = 0;
+              theB0.TrkPd0Sign = trk1_d0sig  ;
+//            (itrk1.quality(reco::TrackBase::highPurity)) ? theB0.TrkPHQ = 1 : theB0.TrkPHQ = 0;
               
               theB0.TrkMPt     = itrk2.pt( ) ;
               theB0.TrkMEta    = itrk2.eta() ;
               theB0.TrkMPhi    = itrk2.phi() ;
-              theB0.TrkMd0Sign = trkM_d0sig  ;
-              (itrk2.quality(reco::TrackBase::highPurity)) ? theB0.TrkMHQ = 1 : theB0.TrkMHQ = 0;
+              theB0.TrkMd0Sign = trk2_d0sig  ;
+//            (itrk2.quality(reco::TrackBase::highPurity)) ? theB0.TrkMHQ = 1 : theB0.TrkMHQ = 0;
 
               theB0.KStarMass          = pKstar.mass()    ;
               theB0.barKStarMass       = pKstarBar.mass() ;
