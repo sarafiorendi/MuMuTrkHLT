@@ -21,6 +21,7 @@ git checkout bph-hlt-cmssw/master HLTrigger/Configuration/test/customize_hlt.py
 mkdir MyTools/  
 cd MyTools/  
 git clone git@github.com:sarafiorendi/MuMuTrkHLT.git  
+cd MuMuTrkHLT  
 git checkout newntuples  
 
 cd ..  
