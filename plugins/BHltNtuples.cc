@@ -67,27 +67,29 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
   mind0Sign_              (cfg.getUntrackedParameter<double>("mind0Sign"))
 
 {
+   usesResource("TFileService");
+
 }
 
 
 void BHltNtuples::beginJob() {
 
   TH1::SetDefaultSumw2() ;
-  outTree_["ntupleTree"] = outfile_-> make<TTree>("ntupleTree","ntupleTree");
-  outTree_["ntupleTree"] -> Branch("event" ,&event_, 64000,2);
-
-  hists_["countEvents"  ] = outfile_->make<TH1F>("countEvents" , "countEvents"              ,    4,     0.,    4 );
-  hists_["mumuMass_all" ] = outfile_->make<TH1F>("mumuMass_all", "mass"                     , 2000,     0.,   20 ); 
-
-  hists_["JpsiPt"       ] = outfile_->make<TH1F>("JpsiPt"      , "mass"                     ,  400,     0.,   40 ); 
-  hists_["JpsiLS"       ] = outfile_->make<TH1F>("JpsiLS"      , "mass"                     ,  400,     0.,   40 ); 
-  hists_["JpsiCos"      ] = outfile_->make<TH1F>("JpsiCos"     , "mass"                     , 2000,    -1.,    1 ); 
-  hists_["JpsiCL"       ] = outfile_->make<TH1F>("JpsiCL"      , "mass"                     , 1000,     0.,    1 ); 
-
-  hists_["trkPt"        ] = outfile_->make<TH1F>("trkPt"       , "pt trk"                   ,  150,     0.,   15 );
-  hists_["onlineTrkPt"  ] = outfile_->make<TH1F>("onlineTrkPt" , "pt onl trk"               ,  150,     0.,   15 );
-  hists_["D0sig"        ] = outfile_->make<TH1F>("D0sig"       , ""                         ,  600,    -1.,    5 ); 
-  hists_["B0InvMass"    ] = outfile_->make<TH1F>("B0InvMass"   , "B0InvMass"                , 2000,     0.,   20.);
+  outTree_ = outfile_-> make<TTree>("ntupleTree","ntupleTree");
+  outTree_ -> Branch("event" ,&event_, 64000,2);
+// 
+//   hists_["countEvents"  ] = outfile_->make<TH1F>("countEvents" , "countEvents"              ,    4,     0.,    4 );
+//   hists_["mumuMass_all" ] = outfile_->make<TH1F>("mumuMass_all", "mass"                     , 2000,     0.,   20 ); 
+// 
+//   hists_["JpsiPt"       ] = outfile_->make<TH1F>("JpsiPt"      , "mass"                     ,  400,     0.,   40 ); 
+//   hists_["JpsiLS"       ] = outfile_->make<TH1F>("JpsiLS"      , "mass"                     ,  400,     0.,   40 ); 
+//   hists_["JpsiCos"      ] = outfile_->make<TH1F>("JpsiCos"     , "mass"                     , 2000,    -1.,    1 ); 
+//   hists_["JpsiCL"       ] = outfile_->make<TH1F>("JpsiCL"      , "mass"                     , 1000,     0.,    1 ); 
+// 
+//   hists_["trkPt"        ] = outfile_->make<TH1F>("trkPt"       , "pt trk"                   ,  150,     0.,   15 );
+//   hists_["onlineTrkPt"  ] = outfile_->make<TH1F>("onlineTrkPt" , "pt onl trk"               ,  150,     0.,   15 );
+//   hists_["D0sig"        ] = outfile_->make<TH1F>("D0sig"       , ""                         ,  600,    -1.,    5 ); 
+//   hists_["B0InvMass"    ] = outfile_->make<TH1F>("B0InvMass"   , "B0InvMass"                , 2000,     0.,   20.);
 
 }    
 
@@ -109,6 +111,7 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   event_.runNumber             = event.id().run();
   event_.luminosityBlockNumber = event.id().luminosityBlock();
   event_.eventNumber           = event.id().event();
+
 
   // Fill PU info
   if (!event.isRealData()) {
@@ -241,7 +244,7 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
 
 
 
-  outTree_["ntupleTree"] -> Fill();
+  outTree_ -> Fill();
 }
 
 

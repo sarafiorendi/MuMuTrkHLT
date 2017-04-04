@@ -60,3 +60,56 @@ std::pair<double,double> pionImpactParameter(reco::TransientTrack piTT, Transien
   return measure;
 }
 
+
+void computeCosAlpha (double Vx,
+			     double Vy,
+			     double Vz,
+			     double Wx,
+			     double Wy,
+			     double Wz,
+			     double VxErr2,
+			     double VyErr2,
+			     double VzErr2,
+			     double VxyCov,
+			     double VxzCov,
+			     double VyzCov,
+			     double WxErr2,
+			     double WyErr2,
+			     double WzErr2,
+			     double WxyCov,
+			     double WxzCov,
+			     double WyzCov,
+			     double* cosAlpha,
+			     double* cosAlphaErr)
+{
+  double Vnorm = sqrt(Vx*Vx + Vy*Vy + Vz*Vz);
+  double Wnorm = sqrt(Wx*Wx + Wy*Wy + Wz*Wz);
+  double VdotW = Vx*Wx + Vy*Wy + Vz*Wz;
+  
+  if ((Vnorm > 0.) && (Wnorm > 0.))
+    {
+      *cosAlpha = VdotW / (Vnorm * Wnorm);
+      *cosAlphaErr = sqrt( ((Vx*Wnorm - VdotW*Wx) * (Vx*Wnorm - VdotW*Wx) * WxErr2 +
+			    (Vy*Wnorm - VdotW*Wy) * (Vy*Wnorm - VdotW*Wy) * WyErr2 +
+			    (Vz*Wnorm - VdotW*Wz) * (Vz*Wnorm - VdotW*Wz) * WzErr2 +
+			   
+			    (Vx*Wnorm - VdotW*Wx) * (Vy*Wnorm - VdotW*Wy) * 2.*WxyCov +
+			    (Vx*Wnorm - VdotW*Wx) * (Vz*Wnorm - VdotW*Wz) * 2.*WxzCov +
+			    (Vy*Wnorm - VdotW*Wy) * (Vz*Wnorm - VdotW*Wz) * 2.*WyzCov) /
+			   (Wnorm*Wnorm*Wnorm*Wnorm) +
+			   
+			   ((Wx*Vnorm - VdotW*Vx) * (Wx*Vnorm - VdotW*Vx) * VxErr2 +
+			    (Wy*Vnorm - VdotW*Vy) * (Wy*Vnorm - VdotW*Vy) * VyErr2 +
+			    (Wz*Vnorm - VdotW*Vz) * (Wz*Vnorm - VdotW*Vz) * VzErr2 +
+			    
+			    (Wx*Vnorm - VdotW*Vx) * (Wy*Vnorm - VdotW*Vy) * 2.*VxyCov +
+			    (Wx*Vnorm - VdotW*Vx) * (Wz*Vnorm - VdotW*Vz) * 2.*VxzCov +
+			    (Wy*Vnorm - VdotW*Vy) * (Wz*Vnorm - VdotW*Vz) * 2.*VyzCov) /
+			   (Vnorm*Vnorm*Vnorm*Vnorm) ) / (Wnorm*Vnorm);
+    }
+  else
+    {
+      *cosAlpha = 0.;
+      *cosAlphaErr = 0.;
+    }
+}

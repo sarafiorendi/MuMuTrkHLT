@@ -94,6 +94,20 @@ public:
   Float_t JpsiTkTkL                 ;  
   Float_t JpsiTkTkSigma             ;  
   Float_t JpsiTkTkCosBS             ;  
+  
+  Float_t cosThetaK                 ;
+  Float_t cosThetaKErr              ;
+  Float_t cosThetaMup               ;
+  Float_t cosThetaMupErr            ;
+  Float_t cosThetaMum               ;
+  Float_t cosThetaMumErr            ;
+  Float_t cosThetaK_Bbar            ;
+  Float_t cosThetaKErr_Bbar         ;
+  Float_t phiKstMuMuPlane           ;
+  Float_t phiKstMuMuPlane_Bbar      ;
+  
+  
+  
 
   B0Cand(){};
   virtual ~B0Cand(){};
@@ -108,6 +122,8 @@ public:
   Float_t pt;           
   Float_t eta;          
   Float_t phi;          
+  Float_t etaAtVtx;          
+  Float_t phiAtVtx;          
   Int_t   charge;      
   Int_t   quality;      
   

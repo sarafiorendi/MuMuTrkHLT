@@ -66,7 +66,7 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
         if( muon::isSoftMuon( (*mu2), pvColl[0]) && (*mu2).pt() > 0 && fabs( (*mu2).eta() ) < 2.4) 
         {
           if(!( mu1->charge() * mu2->charge() < 0 ))         continue; 
-          hists_["mumuMass_all"]->Fill( (mu1->p4() + mu2->p4()).mass() );
+//           hists_["mumuMass_all"]->Fill( (mu1->p4() + mu2->p4()).mass() );
 
           // do jpsi vertex fit
           std::vector<reco::TransientTrack> j_tks;
@@ -100,10 +100,10 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
           float jpsi_ls  = displacementFromBeamspotJpsi.perp() /sqrt(jerr.rerr(displacementFromBeamspotJpsi));
           float jpsi_cos = vperpj.Dot(jpperp)/(vperpj.R()*jpperp.R());
 
-          hists_["JpsiPt"  ]->Fill( jpperp.R() );
-          hists_["JpsiLS"  ]->Fill( jpsi_ls    );
-          hists_["JpsiCos" ]->Fill( jpsi_cos   );
-          hists_["JpsiCL"  ]->Fill( dimuonCL   );
+//           hists_["JpsiPt"  ]->Fill( jpperp.R() );
+//           hists_["JpsiLS"  ]->Fill( jpsi_ls    );
+//           hists_["JpsiCos" ]->Fill( jpsi_cos   );
+//           hists_["JpsiCL"  ]->Fill( dimuonCL   );
          
           if (jpperp.R()   < minJpsiPt_    ) continue;
           if (jpsi_ls      < minJpsiLS_    ) continue;
@@ -121,8 +121,8 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
             TrajectoryStateClosestToBeamLine tscb( blsBuilder(InitialFTS, *recoBeamSpotHandle) );
             float trk1_d0sig = tscb.transverseImpactParameter().significance();
 
-            hists_["trkPt"] -> Fill( itrk1.pt() );
-            hists_["D0sig"] -> Fill( trk1_d0sig );
+//             hists_["trkPt"] -> Fill( itrk1.pt() );
+//             hists_["D0sig"] -> Fill( trk1_d0sig );
  
             for (selTracksDef::const_iterator tracksIt2 = qualityTracksMinus.begin(); tracksIt2 != qualityTracksMinus.end(); ++tracksIt2)
             {
@@ -134,10 +134,10 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               FreeTrajectoryState InitialFTS2 = initialFreeState(itrk2, magField);
               TrajectoryStateClosestToBeamLine tscb2( blsBuilder(InitialFTS2, *recoBeamSpotHandle) );
               float trk2_d0sig = tscb2.transverseImpactParameter().significance();
-              hists_["trkPt"] -> Fill(itrk2.pt()   );
-              hists_["D0sig"] -> Fill(trk2_d0sig   );
+//               hists_["trkPt"] -> Fill(itrk2.pt()   );
+//               hists_["D0sig"] -> Fill(trk2_d0sig   );
 
-              reco::Particle::LorentzVector pB, pbarB, p1, p2, p3_k, p4_p, p3_p, p4_k, pKstar, pKstarBar;
+              reco::Particle::LorentzVector pB, pbarB, p1, p2, p3_k, p4_p, p3_p, p4_k, pKstar, pKstarBar, pJpsi;
 
               // Combined system
               double e1   = sqrt(mu1->momentum().Mag2()  + MuMass2          );
@@ -158,6 +158,8 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               pbarB     = p1 + p2 + p3_p + p4_k;
               pKstar    = p3_k + p4_p;
               pKstarBar = p3_p + p4_k;
+              
+              pJpsi = p1 + p2;
             
               if (pB.mass() > 8 && pbarB.mass() > 8.) continue;
 
@@ -173,7 +175,7 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               TransientVertex tv  = kvf.vertex(t_tks);
               reco::Vertex vertex = tv;
               if (!tv.isValid()) continue;
-              hists_["B0InvMass"]->Fill( pB.mass() );
+//               hists_["B0InvMass"]->Fill( pB.mass() );
 
               float JpsiTkTkCL = 0;
               if ((vertex.chi2()>=0.0) && (vertex.ndof()>0) )   
@@ -192,9 +194,212 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
                                                         (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dydz()), 
                                                     0);
               reco::Vertex::Point vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
-              
-
+ 
+ 
               B0Cand theB0;
+
+ 
+			  // calculate angular vars for B0
+			  {
+			  TLorentzVector LoreVecB0;
+
+			  TLorentzVector LoreVecMuMu;
+			  LoreVecMuMu.SetXYZM(pJpsi.px(), pJpsi.py(), pJpsi.pz(), pJpsi.mass());
+			  TVector3 boostMuMu = LoreVecMuMu.BoostVector();
+			  TLorentzVector LoreVecMup;
+			  if (mu1->charge() > 0)
+				LoreVecMup.SetXYZM(mu1->px(),mu1->py(),mu1->pz(),MuMass);
+			  else
+				LoreVecMup.SetXYZM(mu2->px(),mu2->py(),mu2->pz(),MuMass);
+			  // # Boost mu+ to mumu ref. frame #
+			  LoreVecMup.Boost(-boostMuMu);
+			  // # Boost B0 to mumu ref. frame #
+			  LoreVecB0.SetXYZM(pB.px(), pB.py(), pB.pz(), pB.mass());
+			  LoreVecB0.Boost(-boostMuMu);
+			  // # Compute angles #
+			  double cosThetaMup,  cosThetaMupErr;
+			  computeCosAlpha(-LoreVecB0.Px(),-LoreVecB0.Py(),-LoreVecB0.Pz(),
+						   LoreVecMup.Px(),LoreVecMup.Py(),LoreVecMup.Pz(),
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   &cosThetaMup,&cosThetaMupErr);
+
+			  TLorentzVector LoreVecKst;
+			  LoreVecKst.SetXYZM(pKstar.px(), pKstar.py(), pKstar.pz(),pKstar.mass());
+			  TVector3 boostKst = LoreVecKst.BoostVector();
+			  TLorentzVector LoreVecK;
+			  LoreVecK.SetXYZM(p3_k.px(),p3_k.py(),p3_k.pz(),thirdTrackMass_);
+	// 		  LoreVecK.SetXYZM(NTupleIn->kstTrkpPx->at(BestCandIndx),NTupleIn->kstTrkpPy->at(BestCandIndx),NTupleIn->kstTrkpPz->at(BestCandIndx),Utility->kaonMass);
+
+
+			  // # Boost K+ to K*0 ref. frame #
+			  LoreVecK.Boost(-boostKst);
+			  // # Boost B0 to K*0 ref. frame #
+			  LoreVecB0.SetXYZM(pB.px(), pB.py(), pB.pz(),pB.mass());
+			  LoreVecB0.Boost(-boostKst);
+			  // # Compute angles #
+			  double cosThetaK,  cosThetaKErr, phiKstMuMuPlane;
+			  computeCosAlpha(-LoreVecB0.Px(),-LoreVecB0.Py(),-LoreVecB0.Pz(),
+						   LoreVecK.Px(),LoreVecK.Py(),LoreVecK.Pz(),
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   &cosThetaK,&cosThetaKErr);
+
+			  // # Angle between [mu+ - mu-] and [K - pi] planes in the B0 ref. frame #
+			  LoreVecB0.SetXYZM(pB.px(), pB.py(), pB.pz(),pB.mass());
+			  TVector3 boostB0 = LoreVecB0.BoostVector();
+			  if (mu1->charge() > 0)
+				LoreVecMup.SetXYZM(mu1->px(),mu1->py(),mu1->pz(),MuMass);
+			  else
+				LoreVecMup.SetXYZM(mu2->px(),mu2->py(),mu2->pz(),MuMass);
+			  TLorentzVector LoreVecMum;
+
+			  if (mu1->charge() < 0)
+				LoreVecMum.SetXYZM(mu1->px(),mu1->py(),mu1->pz(),MuMass);
+			  else
+				LoreVecMum.SetXYZM(mu2->px(),mu2->py(),mu2->pz(),MuMass);
+
+			  LoreVecK.SetXYZM(p3_k.px(),p3_k.py(),p3_k.pz(),thirdTrackMass_);
+			  TLorentzVector LoreVecPi;
+			  LoreVecPi.SetXYZM(p4_p.px(),p4_p.py(),p4_p.pz(),fourthTrackMass_);
+
+			  LoreVecMum.Boost(-boostB0);
+			  LoreVecMup.Boost(-boostB0);
+			  LoreVecK.Boost(-boostB0);
+			  LoreVecPi.Boost(-boostB0);
+			  TVector3 MuMuPlane = LoreVecMup.Vect().Cross(LoreVecMum.Vect());
+			  TVector3 KstPlane  = LoreVecK.Vect().Cross(LoreVecPi.Vect());
+			  if (MuMuPlane.Cross(KstPlane).Dot(-LoreVecB0.Vect()) > 0.0) phiKstMuMuPlane = MuMuPlane.Angle(KstPlane);
+			  else                                                        phiKstMuMuPlane = -MuMuPlane.Angle(KstPlane);
+
+			  theB0.cosThetaMup        = cosThetaMup          ;
+			  theB0.cosThetaMupErr     = cosThetaMupErr       ;
+			  theB0.cosThetaK          = cosThetaK            ;
+			  theB0.cosThetaKErr       = cosThetaKErr         ;
+			  theB0.phiKstMuMuPlane    = phiKstMuMuPlane      ;
+
+			  }
+ 
+
+
+
+			  // calculate angular vars for B0bar *****************
+			  {
+			  double cosThetaMum, cosThetaMumErr;
+			  double cosThetaK_Bbar, cosThetaKErr_Bbar;
+			  double phiKstMuMuPlane_Bbar;
+
+			  TLorentzVector LoreVecB0;
+
+			  TLorentzVector LoreVecMuMu;
+			  LoreVecMuMu.SetXYZM(pJpsi.px(), pJpsi.py(), pJpsi.pz(), pJpsi.mass());
+			  TVector3 boostMuMu = LoreVecMuMu.BoostVector();
+			  TLorentzVector LoreVecMum;
+			  if (mu1->charge() < 0)
+				LoreVecMum.SetXYZM(mu1->px(),mu1->py(),mu1->pz(),MuMass);
+			  else
+				LoreVecMum.SetXYZM(mu2->px(),mu2->py(),mu2->pz(),MuMass);
+
+			  // ################################
+			  // # Boost mu- to mumu ref. frame #
+			  // ################################
+			  LoreVecMum.Boost(-boostMuMu);
+			  // ###############################
+			  // # Boost B0 to mumu ref. frame #
+			  // ###############################
+			  LoreVecB0.SetXYZM(pbarB.px(), pbarB.py(), pbarB.pz(),pbarB.mass());
+			  LoreVecB0.Boost(-boostMuMu);
+
+			  computeCosAlpha(-LoreVecB0.Px(),-LoreVecB0.Py(),-LoreVecB0.Pz(),
+						   LoreVecMum.Px(),LoreVecMum.Py(),LoreVecMum.Pz(),
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   &cosThetaMum,&cosThetaMumErr);
+
+
+			  TLorentzVector LoreVecKst;
+			  LoreVecKst.SetXYZM(pKstarBar.px(), pKstarBar.py(), pKstarBar.pz(),pKstarBar.mass());
+
+	// 		  LoreVecKst.SetXYZM(NTupleIn->kstPx->at(BestCandIndx),NTupleIn->kstPy->at(BestCandIndx),NTupleIn->kstPz->at(BestCandIndx),NTupleIn->kstBarMass->at(BestCandIndx));
+			  TVector3 boostKst = LoreVecKst.BoostVector();
+			  TLorentzVector LoreVecK;
+			  LoreVecK.SetXYZM(p4_k.px(), p4_k.py(), p4_k.pz(), thirdTrackMass_);
+			  // ##############################
+			  // # Boost K- to K*0 ref. frame #
+			  // ##############################
+			  LoreVecK.Boost(-boostKst);
+			  // ##############################
+			  // # Boost B0 to K*0 ref. frame #
+			  // ##############################
+			  LoreVecB0.SetXYZM(pbarB.px(), pbarB.py(), pbarB.pz(),pbarB.mass());
+			  LoreVecB0.Boost(-boostKst);
+			  // ##################
+			  // # Compute angles #
+			  // ##################
+			  computeCosAlpha(-LoreVecB0.Px(),-LoreVecB0.Py(),-LoreVecB0.Pz(),
+						   LoreVecK.Px(),LoreVecK.Py(),LoreVecK.Pz(),
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   0.0,0.0,0.0,
+						   &cosThetaK_Bbar,&cosThetaKErr_Bbar);
+
+
+			  // ######################################################################
+			  // # Angle between [mu+ - mu-] and [K - pi] planes in the B0 ref. frame #
+			  // ######################################################################
+			  LoreVecB0.SetXYZM(pbarB.px(), pbarB.py(), pbarB.pz(),pbarB.mass());
+			  TVector3 boostB0 = LoreVecB0.BoostVector();
+
+		  
+			  TLorentzVector LoreVecMup;
+			  if (mu1->charge() > 0)
+				LoreVecMup.SetXYZM(mu1->px(),mu1->py(),mu1->pz(),MuMass);
+			  else
+				LoreVecMup.SetXYZM(mu2->px(),mu2->py(),mu2->pz(),MuMass);
+
+			  if (mu1->charge() < 0)
+				LoreVecMum.SetXYZM(mu1->px(),mu1->py(),mu1->pz(),MuMass);
+			  else
+				LoreVecMum.SetXYZM(mu2->px(),mu2->py(),mu2->pz(),MuMass);
+
+			  LoreVecK.SetXYZM(p4_k.px(), p4_k.py(), p4_k.pz(), thirdTrackMass_);
+			  TLorentzVector LoreVecPi;
+			  LoreVecPi.SetXYZM(p3_p.px(), p3_p.py(), p3_p.pz(), fourthTrackMass_);
+
+			  LoreVecMum.Boost(-boostB0);
+			  LoreVecMup.Boost(-boostB0);
+			  LoreVecK.Boost(-boostB0);
+			  LoreVecPi.Boost(-boostB0);
+			  TVector3 MuMuPlane = LoreVecMum.Vect().Cross(LoreVecMup.Vect());
+			  TVector3 KstPlane  = LoreVecK.Vect().Cross(LoreVecPi.Vect());
+			  if (MuMuPlane.Cross(KstPlane).Dot(-LoreVecB0.Vect()) > 0.0) phiKstMuMuPlane_Bbar = MuMuPlane.Angle(KstPlane);
+			  else                                                        phiKstMuMuPlane_Bbar = -MuMuPlane.Angle(KstPlane);
+			
+			  theB0.cosThetaMum          = cosThetaMum            ;
+			  theB0.cosThetaMumErr       = cosThetaMumErr         ;
+			  theB0.cosThetaK_Bbar       = cosThetaK_Bbar         ;
+			  theB0.cosThetaKErr_Bbar    = cosThetaKErr_Bbar      ;
+			  theB0.phiKstMuMuPlane_Bbar = phiKstMuMuPlane_Bbar   ;
+			
+			}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
               
               theB0.Mu1Pt    = mu1 -> pt( );
               theB0.Mu1Eta   = mu1 -> eta();

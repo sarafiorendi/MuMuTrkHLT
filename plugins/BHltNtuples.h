@@ -1,6 +1,6 @@
 /** \class BHltNtuples
  */      
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -49,14 +49,15 @@
 #include <string>
 #include <iomanip>
 #include "TTree.h"
+#include "TLorentzVector.h"
 
 #include "MyTools/MuMuTrkHLT/src/ntupleTree.h"
 
 
-class BHltNtuples : public edm::EDAnalyzer {
+class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
  public:
-  BHltNtuples(const edm::ParameterSet& cfg);
+  explicit BHltNtuples(const edm::ParameterSet& cfg);
   virtual ~BHltNtuples() {};
 
   virtual void beginJob();
@@ -129,9 +130,6 @@ class BHltNtuples : public edm::EDAnalyzer {
   std::pair<double,double>  pionIPBeamSpot     ( reco::TransientTrack,   GlobalPoint          ) ;
   std::pair<double,double>  pionImpactParameter(reco::TransientTrack,    TransientVertex      ) ;
   
-  /// file service
-  edm::Service<TFileService> outfile_;
-
   // Trigger process
   edm::InputTag triggerResultTag_;
   edm::EDGetTokenT<edm::TriggerResults>   triggerResultToken_;
@@ -176,11 +174,13 @@ class BHltNtuples : public edm::EDAnalyzer {
   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> cosToken_;
   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> vertexToken_;
 
+  /// file service
+  edm::Service<TFileService> outfile_;
   ntupleEvent event_;
-  std::map<std::string,TTree*> outTree_;
+  TTree* outTree_;
 
   /// histograms
-  std::map<std::string, TH1*> hists_;
+//   std::map<std::string, TH1*> hists_;
   
   unsigned int nGoodVtx; 
 
