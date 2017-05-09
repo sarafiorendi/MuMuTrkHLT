@@ -259,8 +259,10 @@ void BHltNtuples::fillL1Muons(const edm::Handle<l1t::MuonBxCollection> & l1cands
       theL1Mu.pt       = muon -> pt();
       theL1Mu.eta      = muon -> eta();
       theL1Mu.phi      = muon -> phi();
-      theL1Mu.etaAtVtx = muon -> etaAtVtx();
-      theL1Mu.phiAtVtx = muon -> phiAtVtx();
+      theL1Mu.etaAtVtx = -999;
+      theL1Mu.phiAtVtx = -999;
+//       theL1Mu.etaAtVtx = muon -> etaAtVtx();
+//       theL1Mu.phiAtVtx = muon -> phiAtVtx();
       theL1Mu.charge   = muon -> charge();
       theL1Mu.quality  = muon -> hwQual();
 

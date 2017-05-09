@@ -6,6 +6,8 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
                             const edm::EventSetup                         & eventSetup)
 {
 
+  const float  kStarMassPDG = 0.89166;
+
   const double thirdTrackMass2  = thirdTrackMass_ *thirdTrackMass_ ; // kaon
   const double fourthTrackMass2 = fourthTrackMass_*fourthTrackMass_; // pion
 
@@ -121,6 +123,7 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
             TrajectoryStateClosestToBeamLine tscb( blsBuilder(InitialFTS, *recoBeamSpotHandle) );
             float trk1_d0sig = tscb.transverseImpactParameter().significance();
 
+            if (trk1_d0sig < 1.) continue;
 //             hists_["trkPt"] -> Fill( itrk1.pt() );
 //             hists_["D0sig"] -> Fill( trk1_d0sig );
  
@@ -134,6 +137,9 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               FreeTrajectoryState InitialFTS2 = initialFreeState(itrk2, magField);
               TrajectoryStateClosestToBeamLine tscb2( blsBuilder(InitialFTS2, *recoBeamSpotHandle) );
               float trk2_d0sig = tscb2.transverseImpactParameter().significance();
+
+              if (trk2_d0sig < 1.) continue;
+
 //               hists_["trkPt"] -> Fill(itrk2.pt()   );
 //               hists_["D0sig"] -> Fill(trk2_d0sig   );
 
@@ -161,7 +167,10 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               
               pJpsi = p1 + p2;
             
-              if (pB.mass() > 8 && pbarB.mass() > 8.) continue;
+              if (pB.mass() > 7. && pbarB.mass() > 7.) continue;
+              if (pB.mass() < 4. && pbarB.mass() < 4.) continue;
+              if (fabs(pKstar.mass() - kStarMassPDG) > 0.4 && fabs(pKstarBar.mass() - kStarMassPDG) > 0.4) continue;
+
 
               // do the vertex fit
               std::vector<reco::TransientTrack> t_tks;
@@ -194,6 +203,9 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
                                                         (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dydz()), 
                                                     0);
               reco::Vertex::Point vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
+ 
+ 
+              if (displacementFromBeamspot.perp() / sqrt(err.rerr(displacementFromBeamspot)) < 5.) continue;;
  
  
               B0Cand theB0;
@@ -284,8 +296,6 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
 
 			  }
  
-
-
 
 			  // calculate angular vars for B0bar *****************
 			  {
@@ -389,14 +399,6 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
 			  theB0.phiKstMuMuPlane_Bbar = phiKstMuMuPlane_Bbar   ;
 			
 			}
- 
- 
- 
- 
- 
- 
- 
- 
  
  
  
