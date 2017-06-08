@@ -1,8 +1,9 @@
 # MuMuTrkHLT  
 
 Package to produce ntuples to study displaced Jpsi + track trigger  
-Need some additions to the CMSSW release to have hlt quantities saved 
-
+Need some additions to the CMSSW release to have hlt quantities saved.   
+Please use the most up-to-date recipe for setting the release as in 
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGlobalHLT#Trigger_development_for_Run_2
 
 cmsrel CMSSW_8_0_0  
 cd CMSSW_8_0_0/src/  
