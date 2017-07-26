@@ -7,6 +7,7 @@
 #include "BHltNtuples_fillhltB0s.h"
 #include "BHltNtuples_fillGen.h"
 #include "BHltNtuples_fillB0s.h"
+#include "BHltNtuples_fillBp.h"
 
 
 /// default constructor
@@ -61,6 +62,8 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
   fourthTrackMass_        (cfg.getUntrackedParameter<double>("fourthTrkMass")), //pion mass
   skimJpsiDisplaced_      (cfg.getUntrackedParameter<bool>("displacedJpsi")),
   doOffline_              (cfg.getUntrackedParameter<bool>("doOffline")),
+  doBplus_                (cfg.getUntrackedParameter<bool>("doBplus")),
+  doBzero_                (cfg.getUntrackedParameter<bool>("doBzero")),
 
   maxEta_                 (cfg.getUntrackedParameter<double>("maxEta")), 
   minPtTrk_               (cfg.getUntrackedParameter<double>("minPtTrk")),
@@ -144,17 +147,17 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     edm::LogError("") << "Trigger collection for probe muon not found !!!";
 
   // Fill trigger information for tag muon
-//   edm::Handle<edm::TriggerResults>   tagTriggerResults;
-//   edm::Handle<trigger::TriggerEvent> tagTriggerEvent;
+  edm::Handle<edm::TriggerResults>   tagTriggerResults;
+  edm::Handle<trigger::TriggerEvent> tagTriggerEvent;
       
-//   if (event.getByToken(tagTriggerResultToken_, tagTriggerResults) &&
-//       event.getByToken(tagTriggerSummToken_  , tagTriggerEvent)) {
-//       
-//     edm::TriggerNames tagTriggerNames_ = event.triggerNames(*tagTriggerResults);
-//     fillHlt(tagTriggerResults, tagTriggerEvent, tagTriggerNames_, event, true);
-//   }
-//   else 
-//     edm::LogError("") << "Trigger collection for tag muon not found !!!";
+  if (event.getByToken(tagTriggerResultToken_, tagTriggerResults) &&
+      event.getByToken(tagTriggerSummToken_  , tagTriggerEvent)) {
+      
+    edm::TriggerNames tagTriggerNames_ = event.triggerNames(*tagTriggerResults);
+    fillHlt(tagTriggerResults, tagTriggerEvent, tagTriggerNames_, event, true);
+  }
+  else 
+    edm::LogError("") << "Trigger collection for tag muon not found !!!";
 
 
   if (doOffline_){
@@ -186,7 +189,8 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     event.getByToken(offlineMuonsToken_,  muons);
     edm::Handle<reco::TrackCollection >   tracks;
     event.getByToken(offlineTksToken_,    tracks);
-    fillB0s(muons, tracks, vtxColl, event, eventSetup );
+    if (doBzero_) fillB0s(muons, tracks, vtxColl, event, eventSetup );
+    if (doBplus_) fillBp (muons, tracks, vtxColl, event, eventSetup );
 
   }
   
@@ -204,16 +208,16 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     fillHltMuons  (l3cands, event);
     fillHltDiMuons(l3cands, event, eventSetup);
   }  
-  else
-    edm::LogWarning("") << "Online muon collection not found !!!";
+//   else
+//     edm::LogWarning("") << "Online muon collection not found !!!";
 
 
   // Handle the online track collection and fill online tracks
   edm::Handle<reco::RecoChargedCandidateCollection> tkcands;
   if (event.getByToken(tkcandToken_, tkcands))
     fillHltTracks(tkcands, event, consumesCollector(), tkcandTag_);
-  else
-    edm::LogWarning("") << "Online track collection not found !!!";
+//   else
+//     edm::LogWarning("") << "Online track collection not found !!!";
 
 
   // Handle the online mumu vtx collection and fill container
@@ -221,8 +225,8 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   if (event.getByToken(mumuVtxToken_, hlt_muvtx) && 
       event.getByToken( l3candToken_, l3cands  ) )
     fillHltMuVtx(hlt_muvtx, l3cands, event, eventSetup);
-  else
-    edm::LogWarning("") << "Online dimuon vertex collection not found !!!";
+//   else
+//     edm::LogWarning("") << "Online dimuon vertex collection not found !!!";
 
 
   // Handle the online mumutk vtx collection and fill container
@@ -231,16 +235,16 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
       event.getByToken( l3candToken_, l3cands  )  && 
       event.getByToken( tkcandToken_, tkcands  ) )
     fillHltTkVtx(hlt_tkvtx, l3cands, tkcands, event);
-  else
-    edm::LogWarning("") << "Online muon-trk vertex collection not found !!!";
+//   else
+//     edm::LogWarning("") << "Online muon-trk vertex collection not found !!!";
   
 
   // Handle the online muon collection and fill L1 muons
   edm::Handle<l1t::MuonBxCollection> l1cands;
   if (event.getByToken(l1candToken_, l1cands))
     fillL1Muons(l1cands, event);
-  else
-    edm::LogWarning("") << "Online L1 muon collection not found !!!";
+//   else
+//     edm::LogWarning("") << "Online L1 muon collection not found !!!";
 
 
 

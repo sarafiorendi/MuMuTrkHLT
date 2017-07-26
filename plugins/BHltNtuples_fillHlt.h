@@ -26,7 +26,9 @@ void BHltNtuples::fillHlt(const edm::Handle<edm::TriggerResults>   & triggerResu
            filterTag.find ("Jpsi"          ) !=std::string::npos  ||
            filterTag.find ("LowMass"       ) !=std::string::npos  ||
            filterTag.find ("PsiPrime"      ) !=std::string::npos  ||
-           filterTag.find ("Displaced"     ) !=std::string::npos 
+           filterTag.find ("Track"         ) !=std::string::npos  ||
+           filterTag.find ("Displaced"     ) !=std::string::npos  ||
+           filterTag.find ("L1s"           ) !=std::string::npos  
 //            filterTag.find ("DoubleMu"  ) !=std::string::npos ||
 //            filterTag.find ("DiMuonGlb" ) !=std::string::npos
            ) && 

@@ -116,6 +116,53 @@ public:
 };
 
 
+class BpCand {
+public:
+
+  Float_t  Mu1Pt  ;  
+  Float_t  Mu2Pt  ;  
+  Float_t  Mu1Eta ;  
+  Float_t  Mu1Phi ;  
+  Float_t  Mu2Eta ;  
+  Float_t  Mu2Phi ;  
+  Int_t    Mu1Ch  ;  
+  Int_t    Mu2Ch  ;  
+
+  Float_t MuMuMass       ;  
+  Float_t MuMuCL         ;  
+  Float_t JpsiPosition_x ;  
+  Float_t JpsiPosition_y ;  
+  Float_t JpsiPosition_z ;  
+  Float_t JpsiPt         ;  
+  Float_t JpsiL          ;  
+  Float_t JpsiSigma      ;  
+  Float_t JpsiCosBS      ;  
+
+  Float_t TrkPt         ;  
+  Float_t TrkEta        ;  
+  Float_t TrkPhi        ;  
+  Float_t Trkd0Sign     ;  
+
+  Float_t BMass       ;  
+  Float_t BPt         ;  
+  Float_t BEta        ;  
+  Float_t BPhi        ;  
+
+  Float_t JpsiTkPosition_x        ;  
+  Float_t JpsiTkPosition_y        ;  
+  Float_t JpsiTkPosition_z        ;  
+  Float_t JpsiTkCL                ;  
+  Float_t JpsiTkL                 ;  
+  Float_t JpsiTkSigma             ;  
+  Float_t JpsiTkCosBS             ;  
+
+  BpCand(){};
+  virtual ~BpCand(){};
+
+  ClassDef(BpCand,1)
+};
+
+
 class L1MuonCand {
 public:
 
@@ -303,6 +350,7 @@ public:
 
   std::vector <GenParticleCand>     genParticles; 
   std::vector <B0Cand>              b0cands;         
+  std::vector <BpCand>              bpcands;         
 
   std::vector <HLTMuCand>           hlt_mu;      
   std::vector <HLTTkCand>           hlt_tk;      

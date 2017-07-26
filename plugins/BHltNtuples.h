@@ -90,6 +90,13 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
                      const edm::EventSetup & 
                     );
 
+  void fillBp       (const edm::Handle<reco::MuonCollection> &,
+                     const edm::Handle<reco::TrackCollection> &,
+                     const edm::Handle<reco::VertexCollection >& ,
+                     const edm::Event      &, 
+                     const edm::EventSetup & 
+                    );
+
   void fillL1Muons  (const edm::Handle<l1t::MuonBxCollection> &,
                      const edm::Event   &
                     );
@@ -204,6 +211,8 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double fourthTrackMass_  ;
   bool   skimJpsiDisplaced_;
   bool   doOffline_;
+  bool   doBplus_;
+  bool   doBzero_;
 
   double maxEta_;
   double minPtTrk_;
@@ -230,6 +239,7 @@ void BHltNtuples::beginEvent()
 
   event_.genParticles.clear();
   event_.b0cands.clear();
+  event_.bpcands.clear();
 
   event_.L1muons.clear();
   event_.hlt_mu.clear();
