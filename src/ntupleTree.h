@@ -354,6 +354,7 @@ public:
 
   std::vector <HLTMuCand>           hlt_mu;      
   std::vector <HLTTkCand>           hlt_tk;      
+  std::vector <HLTTkCand>           hlt_pix_tk;      
   std::vector <HLTDimuonCand>       hlt_dimu;
   std::vector <HLTMuMuVtxCand>      hlt_muvtx;      
   std::vector <HLTMuMuTkVtxCand>    hlt_tkvtx;      

@@ -41,6 +41,8 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
     l3candToken_            (consumes<reco::RecoChargedCandidateCollection>(l3candTag_)), 
   tkcandTag_              (cfg.getParameter<edm::InputTag>("TkCandidatesTag")),
     tkcandToken_            (consumes<reco::RecoChargedCandidateCollection>(tkcandTag_)), 
+  pixtkcandTag_           (cfg.getParameter<edm::InputTag>("PixTkCandidatesTag")),
+    pixtkcandToken_         (consumes<reco::RecoChargedCandidateCollection>(pixtkcandTag_)), 
     
 
   mumuVtxTag_             (cfg.getUntrackedParameter<edm::InputTag>("MuMuVtxTag")),
@@ -219,6 +221,9 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
 //   else
 //     edm::LogWarning("") << "Online track collection not found !!!";
 
+  edm::Handle<reco::RecoChargedCandidateCollection> pixtkcands;
+  if (event.getByToken(pixtkcandToken_, pixtkcands))
+    fillHltPixTracks(pixtkcands, event);
 
   // Handle the online mumu vtx collection and fill container
   edm::Handle<reco::VertexCollection> hlt_muvtx;

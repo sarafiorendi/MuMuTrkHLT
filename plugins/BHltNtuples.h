@@ -110,6 +110,10 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
                      edm::InputTag &
                     );
 
+  void fillHltPixTracks(const edm::Handle<reco::RecoChargedCandidateCollection> &,
+                     const edm::Event   &                                     
+                    );
+
   void fillHltDiMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & ,
                       const edm::Event                                        & ,
                       const edm::EventSetup                                   & 
@@ -165,6 +169,8 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> l3candToken_;
   edm::InputTag tkcandTag_;
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> tkcandToken_;
+  edm::InputTag pixtkcandTag_;
+  edm::EDGetTokenT<reco::RecoChargedCandidateCollection> pixtkcandToken_;
   
   edm::InputTag mumuVtxTag_;
   edm::EDGetTokenT<reco::VertexCollection> mumuVtxToken_;
@@ -244,6 +250,7 @@ void BHltNtuples::beginEvent()
   event_.L1muons.clear();
   event_.hlt_mu.clear();
   event_.hlt_tk.clear();
+  event_.hlt_pix_tk.clear();
   event_.hlt_dimu.clear();
   event_.hlt_muvtx.clear();
   event_.hlt_tkvtx.clear();
