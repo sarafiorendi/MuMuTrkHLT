@@ -159,7 +159,7 @@ void BHltNtuples::fillB0s  (const edm::Handle<reco::MuonCollection>       & muon
               pKstar    = p3_k + p4_p;
               pKstarBar = p3_p + p4_k;
             
-              if (pB.mass() > 8 && pbarB.mass() > 8.) continue;
+              if (pB.mass() > 6.5 && pbarB.mass() > 6.5) continue;
 
               // do the vertex fit
               std::vector<reco::TransientTrack> t_tks;

@@ -221,22 +221,22 @@ void BHltNtuples::fillHltMuVtx(const edm::Handle<reco::VertexCollection>        
     
     theVtx.CL = TMath::Prob(hltVertices.at(ivtx).chi2(), hltVertices.at(ivtx).ndof() );
     
-    bool foundMu0 = false;
-    bool foundMu1 = false;
-
-    reco::Vertex::trackRef_iterator trki;
-    for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
-    {
-	   reco::RecoChargedCandidateRef tmp1Ref(l3cands, (*trki).key());
-	   if (! (tmp1Ref -> track().isNull()) && !foundMu0 )  {
-	     theVtx.mu1pt = tmp1Ref -> track() -> pt();
-         foundMu0 = true;
-       }
-       else if (! (tmp1Ref -> track().isNull()) && !foundMu1 ){
-	     theVtx.mu2pt = tmp1Ref -> track() -> pt();
-         foundMu1 = true;
-       }
-    }
+//     bool foundMu0 = false;
+//     bool foundMu1 = false;
+// 
+//     reco::Vertex::trackRef_iterator trki;
+//     for (trki  = hltVertices.at(ivtx).tracks_begin(); trki != hltVertices.at(ivtx).tracks_end(); ++trki) 
+//     {
+// 	   reco::RecoChargedCandidateRef tmp1Ref(l3cands, (*trki).key());
+// 	   if (! (tmp1Ref -> track().isNull()) && !foundMu0 )  {
+// 	     theVtx.mu1pt = tmp1Ref -> track() -> pt();
+//          foundMu0 = true;
+//        }
+//        else if (! (tmp1Ref -> track().isNull()) && !foundMu1 ){
+// 	     theVtx.mu2pt = tmp1Ref -> track() -> pt();
+//          foundMu1 = true;
+//        }
+//     }
     event_.hlt_muvtx.push_back(theVtx);
   }
     
