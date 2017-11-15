@@ -32,6 +32,7 @@
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 // #include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
@@ -54,7 +55,7 @@
 #include "MyTools/MuMuTrkHLT/src/ntupleTree.h"
 
 
-class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::WatchRuns>  {
 
  public:
   explicit BHltNtuples(const edm::ParameterSet& cfg);
@@ -107,7 +108,8 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   void fillHltTracks(const edm::Handle<reco::RecoChargedCandidateCollection> &,
                      const edm::Event   &                                     ,
                      edm::ConsumesCollector &&,
-                     edm::InputTag &
+                     edm::InputTag &,
+                     const int
                     );
 
   void fillHltPixTracks(const edm::Handle<reco::RecoChargedCandidateCollection> &,
@@ -169,6 +171,10 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> l3candToken_;
   edm::InputTag tkcandTag_;
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> tkcandToken_;
+  edm::InputTag glbtkcandTag_;
+  edm::EDGetTokenT<reco::RecoChargedCandidateCollection> glbtkcandToken_;
+  edm::InputTag newtkcandTag_;
+  edm::EDGetTokenT<reco::RecoChargedCandidateCollection> newtkcandToken_;
   edm::InputTag pixtkcandTag_;
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> pixtkcandToken_;
   
@@ -191,6 +197,7 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::Service<TFileService> outfile_;
   ntupleEvent event_;
   TTree* outTree_;
+  
 
   /// histograms
 //   std::map<std::string, TH1*> hists_;
@@ -223,13 +230,34 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double maxEta_;
   double minPtTrk_;
   double mind0Sign_;
+
+  HLTConfigProvider hltConfig_;
+  HLTPrescaleProvider hltPrescaleProvider_;
   
 };
 
 
 void BHltNtuples::endJob() {}
 
-void BHltNtuples::beginRun(const edm::Run & run, const edm::EventSetup & eventSetup) {}
+void BHltNtuples::beginRun(const edm::Run & run, const edm::EventSetup & eventSetup) {
+ 
+  bool changed(true);
+  if (hltPrescaleProvider_.init(run,eventSetup,"HLT",changed)) {
+    // if init returns TRUE, initialisation has succeeded!
+    if (changed) {
+      // The HLT config has actually changed wrt the previous Run, hence rebook your
+      // histograms or do anything else dependent on the revised HLT config
+      std::cout << "Initalizing HLTConfigProvider"  << std::endl;
+    }
+  } else {
+    // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
+    // with the file and/or code and needs to be investigated!
+    std::cout << " HLT config extraction failure with process name HLT" << std::endl;
+    // In this case, all access methods will return empty values!
+  }
+
+  
+}
 
 void BHltNtuples::endRun  (const edm::Run & run, const edm::EventSetup & eventSetup) {}
 
@@ -250,6 +278,8 @@ void BHltNtuples::beginEvent()
   event_.L1muons.clear();
   event_.hlt_mu.clear();
   event_.hlt_tk.clear();
+  event_.hlt_glbtk.clear();
+  event_.hlt_newtk.clear();
   event_.hlt_pix_tk.clear();
   event_.hlt_dimu.clear();
   event_.hlt_muvtx.clear();
@@ -264,6 +294,10 @@ void BHltNtuples::beginEvent()
   event_.nVtx       = -1;
   event_.trueNI     = -1;
   
+  event_.prescale_novtx = -1;
+  event_.prescale_vtx   = -1;
+
+
   nGoodVtx = 0; 
 }
 

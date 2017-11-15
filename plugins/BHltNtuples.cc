@@ -41,6 +41,10 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
     l3candToken_            (consumes<reco::RecoChargedCandidateCollection>(l3candTag_)), 
   tkcandTag_              (cfg.getParameter<edm::InputTag>("TkCandidatesTag")),
     tkcandToken_            (consumes<reco::RecoChargedCandidateCollection>(tkcandTag_)), 
+  glbtkcandTag_           (cfg.getParameter<edm::InputTag>("GlbTkCandidatesTag")),
+    glbtkcandToken_         (consumes<reco::RecoChargedCandidateCollection>(glbtkcandTag_)), 
+  newtkcandTag_           (cfg.getParameter<edm::InputTag>("NewTkCandidatesTag")),
+    newtkcandToken_         (consumes<reco::RecoChargedCandidateCollection>(newtkcandTag_)), 
   pixtkcandTag_           (cfg.getParameter<edm::InputTag>("PixTkCandidatesTag")),
     pixtkcandToken_         (consumes<reco::RecoChargedCandidateCollection>(pixtkcandTag_)), 
     
@@ -69,7 +73,8 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
 
   maxEta_                 (cfg.getUntrackedParameter<double>("maxEta")), 
   minPtTrk_               (cfg.getUntrackedParameter<double>("minPtTrk")),
-  mind0Sign_              (cfg.getUntrackedParameter<double>("mind0Sign"))
+  mind0Sign_              (cfg.getUntrackedParameter<double>("mind0Sign")),
+  hltPrescaleProvider_    (cfg, consumesCollector(), *this)
 
 {
    usesResource("TFileService");
@@ -116,6 +121,13 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   event_.runNumber             = event.id().run();
   event_.luminosityBlockNumber = event.id().luminosityBlock();
   event_.eventNumber           = event.id().event();
+
+  int PrescaleSet = hltPrescaleProvider_.prescaleSet(event, eventSetup);
+  const std::string tr1 = "HLT_DoubleMu4_Jpsi_NoVertexing_v5";
+  const std::string tr2 = "HLT_DoubleMu4_Jpsi_Displaced_v5";
+
+  event_.prescale_novtx =   hltPrescaleProvider_.prescaleValue(event, eventSetup,  tr1) ;
+  event_.prescale_vtx   =   hltPrescaleProvider_.prescaleValue(event, eventSetup,  tr2) ;
 
 
   // Fill PU info
@@ -217,9 +229,18 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   // Handle the online track collection and fill online tracks
   edm::Handle<reco::RecoChargedCandidateCollection> tkcands;
   if (event.getByToken(tkcandToken_, tkcands))
-    fillHltTracks(tkcands, event, consumesCollector(), tkcandTag_);
+    fillHltTracks(tkcands, event, consumesCollector(), tkcandTag_, 0);
+
+  // Handle the online track collection and fill online tracks
+  edm::Handle<reco::RecoChargedCandidateCollection> tkcandsGlb;
+  if (event.getByToken(glbtkcandToken_, tkcandsGlb))
+    fillHltTracks(tkcandsGlb, event, consumesCollector(), glbtkcandTag_, 1);
 //   else
 //     edm::LogWarning("") << "Online track collection not found !!!";
+  // Handle the online track collection and fill online tracks
+  edm::Handle<reco::RecoChargedCandidateCollection> tkcandsNew;
+  if (event.getByToken(newtkcandToken_, tkcandsNew))
+    fillHltTracks(tkcandsNew, event, consumesCollector(), newtkcandTag_, 2);
 
   edm::Handle<reco::RecoChargedCandidateCollection> pixtkcands;
   if (event.getByToken(pixtkcandToken_, pixtkcands))

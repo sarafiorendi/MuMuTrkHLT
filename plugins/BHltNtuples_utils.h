@@ -43,7 +43,7 @@ std::pair<double,double> BHltNtuples::pionIPBeamSpot(reco::TransientTrack piTT, 
   return measureBS;       
 }
 
-std::pair<double,double> pionImpactParameter(reco::TransientTrack piTT, TransientVertex jpsiVtx)
+std::pair<double,double> BHltNtuples::pionImpactParameter(reco::TransientTrack piTT, TransientVertex jpsiVtx)
 {
   std::pair<double,double> measure;
   std::pair<bool,Measurement1D>  piIP_pair = IPTools::absoluteImpactParameter3D(piTT, jpsiVtx);

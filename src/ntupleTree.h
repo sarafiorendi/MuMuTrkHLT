@@ -138,10 +138,13 @@ public:
   Float_t JpsiSigma      ;  
   Float_t JpsiCosBS      ;  
 
-  Float_t TrkPt         ;  
-  Float_t TrkEta        ;  
-  Float_t TrkPhi        ;  
-  Float_t Trkd0Sign     ;  
+  Float_t TrkPt             ;  
+  Float_t TrkEta            ;  
+  Float_t TrkPhi            ;  
+  Float_t Trkd0Sign         ;  
+  Int_t   TrkAlgo           ;  
+  Float_t TrkIPFromJpsi     ;  
+  Float_t TrkIPSignFromJpsi ;  
 
   Float_t BMass       ;  
   Float_t BPt         ;  
@@ -294,6 +297,7 @@ public:
   Float_t pt;            // pt of the object passing the filter [GeV]
   Float_t eta;           // eta of the object passing the filter
   Float_t phi;           // phi of the object passing the filter
+  Int_t   id;            // trigger id of the object passing the filter
   
   HLTObjCand(){};
   virtual ~HLTObjCand(){};
@@ -318,7 +322,7 @@ public:
 
   bool find( const std::string & path ) {
 	for ( std::vector<std::string>::const_iterator it = triggers.begin(); it != triggers.end(); ++it ) {
-// 	  std::cout << it << std::endl;
+// 	  std::cout << *it << std::endl;
       if ( it-> compare(path) == 0) return true;
 //       if ( it->find ( path ) != std::string::npos ) return true;
 	}
@@ -337,6 +341,8 @@ public:
   Int_t   luminosityBlockNumber; 
   Int_t   eventNumber;           
 
+  unsigned int   prescale_novtx;
+  unsigned int   prescale_vtx;
   Int_t   nVtx;                    
   Int_t   nTrks;   
   Float_t trueNI;   
@@ -354,6 +360,8 @@ public:
 
   std::vector <HLTMuCand>           hlt_mu;      
   std::vector <HLTTkCand>           hlt_tk;      
+  std::vector <HLTTkCand>           hlt_glbtk;      
+  std::vector <HLTTkCand>           hlt_newtk;      
   std::vector <HLTTkCand>           hlt_pix_tk;      
   std::vector <HLTDimuonCand>       hlt_dimu;
   std::vector <HLTMuMuVtxCand>      hlt_muvtx;      

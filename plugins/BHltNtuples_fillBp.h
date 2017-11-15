@@ -137,7 +137,7 @@ void BHltNtuples::fillBp  (const edm::Handle<reco::MuonCollection>       & muons
               pB        = p1 + p2 + p3_k;
               pJpsi = p1 + p2;
             
-              if (pB.mass() > 7. || pB.mass() < 4.) continue;
+              if (pB.mass() > 6.5 || pB.mass() < 4.) continue;
 
               // do the vertex fit
               std::vector<reco::TransientTrack> t_tks;
@@ -171,8 +171,11 @@ void BHltNtuples::fillBp  (const edm::Handle<reco::MuonCollection>       & muons
               reco::Vertex::Point vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
  
  
-              if (displacementFromBeamspot.perp() / sqrt(err.rerr(displacementFromBeamspot)) < 5.) continue;;
+              if (displacementFromBeamspot.perp() / sqrt(err.rerr(displacementFromBeamspot)) < 3.) continue;;
  
+              const reco::TransientTrack piTrackCand = (*theB).build(&itrk1);
+              pair<double,double>  pion_IPPair = pionImpactParameter(piTrackCand,jtv);
+
  
               BpCand theBp;
 
@@ -196,10 +199,13 @@ void BHltNtuples::fillBp  (const edm::Handle<reco::MuonCollection>       & muons
               theBp.JpsiPosition_y = jVertex.y();
               theBp.JpsiPosition_z = jVertex.z();
          
-              theBp.TrkPt     = itrk1.pt( ) ;
-              theBp.TrkEta    = itrk1.eta() ;
-              theBp.TrkPhi    = itrk1.phi() ;
-              theBp.Trkd0Sign = trk1_d0sig  ;
+              theBp.TrkPt         = itrk1.pt( ) ;
+              theBp.TrkEta        = itrk1.eta() ;
+              theBp.TrkPhi        = itrk1.phi() ;
+              theBp.Trkd0Sign     = trk1_d0sig  ;
+              theBp.TrkAlgo       = itrk1.originalAlgo()  ;
+              theBp.TrkIPFromJpsi = pion_IPPair.first  ;
+              theBp.TrkIPSignFromJpsi = pion_IPPair.second  ;
 //            (itrk1.quality(reco::TrackBase::highPurity)) ? theBp.TrkPHQ = 1 : theBp.TrkPHQ = 0;
               
 

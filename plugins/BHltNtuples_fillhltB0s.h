@@ -76,7 +76,9 @@ void BHltNtuples::fillHltDiMuons(const edm::Handle<reco::RecoChargedCandidateCol
 void BHltNtuples::fillHltTracks(const edm::Handle<reco::RecoChargedCandidateCollection> & trkcands ,
                                 const edm::Event                                        & event    ,
                                 edm::ConsumesCollector &&                                 iC       ,
-                                edm::InputTag                                           & tkcandTag_)
+                                edm::InputTag                                           & tkcandTag_,
+                                const int ncoll
+                                )
 {
 
   bool d0_valid = false;
@@ -136,7 +138,9 @@ void BHltNtuples::fillHltTracks(const edm::Handle<reco::RecoChargedCandidateColl
       }
     }    
     
-    event_.hlt_tk.push_back(theTk);
+    if      (ncoll ==0) event_.hlt_tk.push_back(theTk);
+    else if (ncoll ==1) event_.hlt_glbtk.push_back(theTk);
+    else if (ncoll ==2) event_.hlt_newtk.push_back(theTk);
   }
 }
 
@@ -145,14 +149,11 @@ void BHltNtuples::fillHltTracks(const edm::Handle<reco::RecoChargedCandidateColl
 void BHltNtuples::fillHltPixTracks(const edm::Handle<reco::RecoChargedCandidateCollection> & trkcands ,
                                    const edm::Event                                        & event    )
 {
-  std::cout << "going to fill pixel tracks" << std::endl;
   for( unsigned int itk = 0; itk < trkcands->size(); ++itk) 
   {
     HLTTkCand theTk;
 
-    std::cout << "inside the loop" << std::endl;
     reco::RecoChargedCandidateRef candref(trkcands, itk);
-    std::cout << "found ref" << std::endl;
     theTk.pt      = candref -> pt();
     theTk.eta     = candref -> eta();
     theTk.phi     = candref -> phi();

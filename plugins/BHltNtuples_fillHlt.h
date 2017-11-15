@@ -52,6 +52,9 @@ void BHltNtuples::fillHlt(const edm::Handle<edm::TriggerResults>   & triggerResu
         hltObj.pt  = triggerObj.pt();
         hltObj.eta = triggerObj.eta();
         hltObj.phi = triggerObj.phi();
+        hltObj.id  = triggerObj.id();
+        
+        
         
         if (isTag)       event_.hltTag.objects.push_back(hltObj);
         else             event_.hlt   .objects.push_back(hltObj);
