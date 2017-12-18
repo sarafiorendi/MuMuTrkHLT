@@ -122,13 +122,17 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   event_.luminosityBlockNumber = event.id().luminosityBlock();
   event_.eventNumber           = event.id().event();
 
-  int PrescaleSet = hltPrescaleProvider_.prescaleSet(event, eventSetup);
+//   int PrescaleSet = hltPrescaleProvider_.prescaleSet(event, eventSetup);
   const std::string tr1 = "HLT_DoubleMu4_Jpsi_NoVertexing_v5";
   const std::string tr2 = "HLT_DoubleMu4_Jpsi_Displaced_v5";
 
+//   const std::string tr1 = "HLT_L1SingleMu18_v3";
+//   const std::pair<int,int> myprescales(hltPrescaleProvider_.prescaleValues(event,eventSetup,tr1));
+//   std::cout << "pair: " << myprescales.first << ", " << myprescales.second << std::endl;
+
   event_.prescale_novtx =   hltPrescaleProvider_.prescaleValue(event, eventSetup,  tr1) ;
   event_.prescale_vtx   =   hltPrescaleProvider_.prescaleValue(event, eventSetup,  tr2) ;
-
+  
 
   // Fill PU info
   if (!event.isRealData()) {
@@ -169,9 +173,19 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
       
     edm::TriggerNames tagTriggerNames_ = event.triggerNames(*tagTriggerResults);
     fillHlt(tagTriggerResults, tagTriggerEvent, tagTriggerNames_, event, true);
+
+	bool rejectedByPrescale    = hltPrescaleProvider_.rejectedByHLTPrescaler(*tagTriggerResults,tagTriggerNames_.triggerIndex(tr1));
+	event_.rej_by_presc_novtx  = rejectedByPrescale;
+	rejectedByPrescale         = hltPrescaleProvider_.rejectedByHLTPrescaler(*tagTriggerResults,tagTriggerNames_.triggerIndex(tr2));
+	event_.rej_by_presc_vtx    = rejectedByPrescale;
+
   }
   else 
     edm::LogError("") << "Trigger collection for tag muon not found !!!";
+
+
+// bool HLTPrescaleProvider::rejectedByHLTPrescaler(const edm::TriggerResults& triggerResults, unsigned int i) const {
+
 
 
   if (doOffline_){

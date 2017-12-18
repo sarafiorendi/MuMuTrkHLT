@@ -343,6 +343,8 @@ public:
 
   unsigned int   prescale_novtx;
   unsigned int   prescale_vtx;
+  unsigned int   rej_by_presc_vtx;
+  unsigned int   rej_by_presc_novtx;
   Int_t   nVtx;                    
   Int_t   nTrks;   
   Float_t trueNI;   

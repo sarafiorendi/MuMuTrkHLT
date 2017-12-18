@@ -33,7 +33,6 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
-// #include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "MagneticField/Engine/interface/MagneticField.h"
@@ -231,7 +230,6 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::o
   double minPtTrk_;
   double mind0Sign_;
 
-  HLTConfigProvider hltConfig_;
   HLTPrescaleProvider hltPrescaleProvider_;
   
 };
@@ -245,15 +243,11 @@ void BHltNtuples::beginRun(const edm::Run & run, const edm::EventSetup & eventSe
   if (hltPrescaleProvider_.init(run,eventSetup,"HLT",changed)) {
     // if init returns TRUE, initialisation has succeeded!
     if (changed) {
-      // The HLT config has actually changed wrt the previous Run, hence rebook your
-      // histograms or do anything else dependent on the revised HLT config
+      // The HLT config has actually changed wrt the previous Run
       std::cout << "Initalizing HLTConfigProvider"  << std::endl;
     }
   } else {
-    // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
-    // with the file and/or code and needs to be investigated!
     std::cout << " HLT config extraction failure with process name HLT" << std::endl;
-    // In this case, all access methods will return empty values!
   }
 
   
@@ -296,6 +290,8 @@ void BHltNtuples::beginEvent()
   
   event_.prescale_novtx = -1;
   event_.prescale_vtx   = -1;
+  event_.rej_by_presc_novtx = -1;
+  event_.rej_by_presc_vtx   = -1;
 
 
   nGoodVtx = 0; 
