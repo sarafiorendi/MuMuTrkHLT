@@ -59,10 +59,10 @@ BHltNtuples::BHltNtuples(const edm::ParameterSet& cfg):
   offlineTksTag_          (cfg.getUntrackedParameter<edm::InputTag>("OfflineTkTag")),
     offlineTksToken_        (consumes<reco::TrackCollection>(offlineTksTag_)), 
 
-    d0token_                (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "d0firstTrk",  "REHLT")) ),   
-    lsToken_                (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "LSigma",      "REHLT")) ),   
-    cosToken_               (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "Cosine",      "REHLT")) ),   
-    vertexToken_            (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "VertexCL",    "REHLT")) ),   
+//     d0token_                (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "d0firstTrk",  "REHLT")) ),   
+//     lsToken_                (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "LSigma",      "REHLT")) ),   
+//     cosToken_               (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "Cosine",      "REHLT")) ),   
+//     vertexToken_            (consumes<reco::RecoChargedCandidateDoubleMap>(edm::InputTag(tkVtxTag_.label(), "VertexCL",    "REHLT")) ),   
 
   thirdTrackMass_         (cfg.getUntrackedParameter<double>("thirdTrkMass")),  //kaon mass
   fourthTrackMass_        (cfg.getUntrackedParameter<double>("fourthTrkMass")), //pion mass
@@ -174,10 +174,10 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     edm::TriggerNames tagTriggerNames_ = event.triggerNames(*tagTriggerResults);
     fillHlt(tagTriggerResults, tagTriggerEvent, tagTriggerNames_, event, true);
 
-	bool rejectedByPrescale    = hltPrescaleProvider_.rejectedByHLTPrescaler(*tagTriggerResults,tagTriggerNames_.triggerIndex(tr1));
-	event_.rej_by_presc_novtx  = rejectedByPrescale;
-	rejectedByPrescale         = hltPrescaleProvider_.rejectedByHLTPrescaler(*tagTriggerResults,tagTriggerNames_.triggerIndex(tr2));
-	event_.rej_by_presc_vtx    = rejectedByPrescale;
+// 	bool rejectedByPrescale    = hltPrescaleProvider_.rejectedByHLTPrescaler(*tagTriggerResults,tagTriggerNames_.triggerIndex(tr1));
+// 	event_.rej_by_presc_novtx  = rejectedByPrescale;
+// 	rejectedByPrescale         = hltPrescaleProvider_.rejectedByHLTPrescaler(*tagTriggerResults,tagTriggerNames_.triggerIndex(tr2));
+// 	event_.rej_by_presc_vtx    = rejectedByPrescale;
 
   }
   else 

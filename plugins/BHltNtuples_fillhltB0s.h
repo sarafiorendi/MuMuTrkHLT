@@ -81,67 +81,67 @@ void BHltNtuples::fillHltTracks(const edm::Handle<reco::RecoChargedCandidateColl
                                 )
 {
 
-  bool d0_valid = false;
-  edm::Handle<reco::RecoChargedCandidateDoubleMap > d0TrkColl; 
-  if   (event.getByToken(d0token_, d0TrkColl)) d0_valid = true;
-  else edm::LogWarning("") << "Online d0 collection not found !!!";
-
-  bool LS_valid = false;
-  edm::Handle< reco::RecoChargedCandidateDoubleMap > LSigmaColl; 
-  if   (event.getByToken(lsToken_, LSigmaColl)) LS_valid = true;
-  else edm::LogWarning("") << "Online LS collection not found !!!";
-
-  bool Cos_valid = false;
-  edm::Handle< reco::RecoChargedCandidateDoubleMap > CosineColl; 
-  if   (event.getByToken(cosToken_, CosineColl)) Cos_valid = true;
-  else edm::LogWarning("") << "Online cosine collection not found !!!";
-
-  bool CL_valid = false;
-  edm::Handle< reco::RecoChargedCandidateDoubleMap > VertexColl; 
-  if   (event.getByToken(vertexToken_, VertexColl)) CL_valid = true;
-  else edm::LogWarning("") << "Online vertex CL collection not found !!!";
-
-
-  for( unsigned int itk = 0; itk < trkcands->size(); ++itk) 
-  {
-    HLTTkCand theTk;
-
-    reco::RecoChargedCandidateRef candref(trkcands, itk);
-    theTk.pt      = candref -> pt();
-    theTk.eta     = candref -> eta();
-    theTk.phi     = candref -> phi();
-    theTk.charge  = candref -> charge();
-    
-    if (d0_valid){
-      for(unsigned int id0 = 0; id0 < (*d0TrkColl).size(); ++id0) {
-        if ((*d0TrkColl).at(id0).first->pt() != candref -> pt()) continue;
-        theTk.d0Sign = d0TrkColl->at(id0).second;
-        break;
-      }
-    }
-    if (LS_valid){
-      for(unsigned int il3 = 0; il3 < (*LSigmaColl).size(); ++il3) {
-        if ((*LSigmaColl).at(il3).first->pt() != candref -> pt()) continue;
-        theTk.LSigma = LSigmaColl->at(il3).second;
-      }
-    }    
-    if (Cos_valid){
-      for(unsigned int ic = 0; ic < (*CosineColl).size(); ++ic) {
-        if ((*CosineColl).at(ic).first->pt() != candref -> pt()) continue;
-        theTk.CosBS = CosineColl->at(ic).second;
-      }
-    }    
-    if (CL_valid){
-      for(unsigned int ic = 0; ic < (*VertexColl).size(); ++ic) {
-        if ((*VertexColl).at(ic).first->pt() != candref -> pt()) continue;
-        theTk.CL = VertexColl->at(ic).second;
-      }
-    }    
-    
-    if      (ncoll ==0) event_.hlt_tk.push_back(theTk);
-    else if (ncoll ==1) event_.hlt_glbtk.push_back(theTk);
-    else if (ncoll ==2) event_.hlt_newtk.push_back(theTk);
-  }
+//   bool d0_valid = false;
+//   edm::Handle<reco::RecoChargedCandidateDoubleMap > d0TrkColl; 
+//   if   (event.getByToken(d0token_, d0TrkColl)) d0_valid = true;
+//   else edm::LogWarning("") << "Online d0 collection not found !!!";
+// 
+//   bool LS_valid = false;
+//   edm::Handle< reco::RecoChargedCandidateDoubleMap > LSigmaColl; 
+//   if   (event.getByToken(lsToken_, LSigmaColl)) LS_valid = true;
+//   else edm::LogWarning("") << "Online LS collection not found !!!";
+// 
+//   bool Cos_valid = false;
+//   edm::Handle< reco::RecoChargedCandidateDoubleMap > CosineColl; 
+//   if   (event.getByToken(cosToken_, CosineColl)) Cos_valid = true;
+//   else edm::LogWarning("") << "Online cosine collection not found !!!";
+// 
+//   bool CL_valid = false;
+//   edm::Handle< reco::RecoChargedCandidateDoubleMap > VertexColl; 
+//   if   (event.getByToken(vertexToken_, VertexColl)) CL_valid = true;
+//   else edm::LogWarning("") << "Online vertex CL collection not found !!!";
+// 
+// 
+//   for( unsigned int itk = 0; itk < trkcands->size(); ++itk) 
+//   {
+//     HLTTkCand theTk;
+// 
+//     reco::RecoChargedCandidateRef candref(trkcands, itk);
+//     theTk.pt      = candref -> pt();
+//     theTk.eta     = candref -> eta();
+//     theTk.phi     = candref -> phi();
+//     theTk.charge  = candref -> charge();
+//     
+//     if (d0_valid){
+//       for(unsigned int id0 = 0; id0 < (*d0TrkColl).size(); ++id0) {
+//         if ((*d0TrkColl).at(id0).first->pt() != candref -> pt()) continue;
+//         theTk.d0Sign = d0TrkColl->at(id0).second;
+//         break;
+//       }
+//     }
+//     if (LS_valid){
+//       for(unsigned int il3 = 0; il3 < (*LSigmaColl).size(); ++il3) {
+//         if ((*LSigmaColl).at(il3).first->pt() != candref -> pt()) continue;
+//         theTk.LSigma = LSigmaColl->at(il3).second;
+//       }
+//     }    
+//     if (Cos_valid){
+//       for(unsigned int ic = 0; ic < (*CosineColl).size(); ++ic) {
+//         if ((*CosineColl).at(ic).first->pt() != candref -> pt()) continue;
+//         theTk.CosBS = CosineColl->at(ic).second;
+//       }
+//     }    
+//     if (CL_valid){
+//       for(unsigned int ic = 0; ic < (*VertexColl).size(); ++ic) {
+//         if ((*VertexColl).at(ic).first->pt() != candref -> pt()) continue;
+//         theTk.CL = VertexColl->at(ic).second;
+//       }
+//     }    
+//     
+//     if      (ncoll ==0) event_.hlt_tk.push_back(theTk);
+//     else if (ncoll ==1) event_.hlt_glbtk.push_back(theTk);
+//     else if (ncoll ==2) event_.hlt_newtk.push_back(theTk);
+//   }
 }
 
 

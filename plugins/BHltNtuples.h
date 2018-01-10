@@ -22,7 +22,7 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
-#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateDoubleAssociation.h"
+// #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateDoubleAssociation.h"
 #include "DataFormats/Scalers/interface/LumiScalers.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
@@ -187,10 +187,10 @@ class BHltNtuples : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::o
   edm::InputTag offlineTksTag_;
   edm::EDGetTokenT<reco::TrackCollection> offlineTksToken_;
 
-  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> d0token_;
-  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> lsToken_;
-  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> cosToken_;
-  edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> vertexToken_;
+//   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> d0token_;
+//   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> lsToken_;
+//   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> cosToken_;
+//   edm::EDGetTokenT<reco::RecoChargedCandidateDoubleMap> vertexToken_;
 
   /// file service
   edm::Service<TFileService> outfile_;
