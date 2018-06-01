@@ -151,6 +151,7 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
       edm::LogError("") << "PU collection not found !!!";
   }
 
+
   // Fill trigger information for probe muon
   edm::Handle<edm::TriggerResults>   triggerResults;
   edm::Handle<trigger::TriggerEvent> triggerEvent;
@@ -190,6 +191,14 @@ void BHltNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
 
   if (doOffline_){
     
+    // Fill beamspot info
+	edm::Handle<reco::BeamSpot>                    theBeamSpot    ;
+	event.getByToken(beamspotToken_,              theBeamSpot)   ;
+	reco::BeamSpot bs = *theBeamSpot;
+	event_.bsx    = bs.x0(); 
+	event_.bsy    = bs.y0(); 
+	event_.bsz    = bs.z0(); 
+
     // Fill vertex info
     edm::Handle<reco::VertexCollection> vtxColl; 
     event.getByToken(offlinePVToken_, vtxColl);

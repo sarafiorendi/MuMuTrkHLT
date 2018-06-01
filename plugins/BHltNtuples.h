@@ -293,6 +293,9 @@ void BHltNtuples::beginEvent()
   event_.rej_by_presc_novtx = -1;
   event_.rej_by_presc_vtx   = -1;
 
+  event_.bsx = -99;
+  event_.bsy = -99;
+  event_.bsz = -99;
 
   nGoodVtx = 0; 
 }

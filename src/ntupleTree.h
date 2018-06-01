@@ -343,6 +343,7 @@ public:
   Int_t   luminosityBlockNumber; 
   Int_t   eventNumber;           
 
+  Float_t bsx, bsy, bsz;
   unsigned int   prescale_novtx;
   unsigned int   prescale_vtx;
   unsigned int   rej_by_presc_vtx;
